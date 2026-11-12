@@ -1,0 +1,150 @@
+<app-menu />
+<div class="container-fluid pt-3">
+
+    <div class="page-header">
+        <div class="page-title">
+            <div class="icon">📦</div>
+            <div>
+                <h1>Produtos</h1>
+                <h2 class="subtitle">Gerencie o cadastro de produtos e visualize os lotes em estoque</h2>
+            </div>
+        </div>
+    </div>
+
+    <div *ngIf="carregando" class="loading-overlay">
+        <div class="spinner"></div>
+        <p>Carregando...</p>
+    </div>
+
+    <div *ngIf="!carregando">
+        <div class="row mb-2 align-items-center">
+            <div class="col">
+                <div class="table-toolbar">
+                    <mat-icon>search</mat-icon>
+                    <input type="text" placeholder="Buscar nome, código, categoria..." (keyup)="aplicarFiltro($event)"
+                        #input />
+                </div>
+            </div>
+            <div class="col-auto">
+                <button class="botao-primario" *ngIf="isSuperAdmin() || authService.temPermissao('GERENCIAR_ESTOQUE')"
+                    (click)="abrirModal()">
+                    <mat-icon>add</mat-icon> Novo Produto
+                </button>
+            </div>
+        </div>
+
+        <table class="mat-elevation-z8" mat-table [dataSource]="dataSource" matSort>
+
+            <ng-container matColumnDef="nome">
+                <th class="th-table" mat-header-cell *matHeaderCellDef mat-sort-header>Nome</th>
+                <td class="td-table" mat-cell *matCellDef="let p">{{ p.nome }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="codigo">
+                <th class="th-table" mat-header-cell *matHeaderCellDef mat-sort-header>Código</th>
+                <td class="td-table" mat-cell *matCellDef="let p">{{ p.codigo }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="categoria">
+                <th class="th-table" mat-header-cell *matHeaderCellDef mat-sort-header>Categoria</th>
+                <td class="td-table" mat-cell *matCellDef="let p">{{ p.categoria || '—' }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="unidadeMedida">
+                <th class="th-table" mat-header-cell *matHeaderCellDef mat-sort-header>Unidade</th>
+                <td class="td-table" mat-cell *matCellDef="let p">{{ p.unidadeMedida }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="status">
+                <th class="th-table" mat-header-cell *matHeaderCellDef mat-sort-header>Status</th>
+                <td class="td-table" mat-cell *matCellDef="let p">
+                    <span class="status-badge" [ngClass]="statusClass(p.status)">{{ p.status }}</span>
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="action">
+                <th class="th-table" mat-header-cell *matHeaderCellDef></th>
+                <td class="td-table" mat-cell *matCellDef="let p">
+                    <mat-icon class="icone-tabela" title="Ver lotes" (click)="selecionarProduto(p)">
+                        {{ produtoSelecionado?.idProduto === p.idProduto ? 'expand_less' : 'expand_more' }}
+                    </mat-icon>
+                    <mat-icon class="icone-tabela" title="Editar"
+                        *ngIf="isSuperAdmin() || authService.temPermissao('GERENCIAR_ESTOQUE')"
+                        (click)="abrirModal(p)">edit</mat-icon>
+                    <mat-icon class="icone-tabela c-error" title="Excluir"
+                        *ngIf="isSuperAdmin() || authService.temPermissao('GERENCIAR_ESTOQUE')"
+                        (click)="excluir(p)">delete</mat-icon>
+                </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="row-clicavel"
+                [class.row-selecionada]="produtoSelecionado?.idProduto === row.idProduto"></tr>
+            <tr class="mat-row" *matNoDataRow>
+                <td class="mat-cell no-data" colspan="6">Nenhum produto encontrado para "{{ input.value }}"</td>
+            </tr>
+        </table>
+
+        <mat-paginator [pageSizeOptions]="[10, 20, 50]" aria-label="Itens por página"></mat-paginator>
+
+        <!-- Painel de Lotes -->
+        <div *ngIf="produtoSelecionado" class="lotes-panel mat-elevation-z4">
+            <div class="lotes-header">
+                <mat-icon>inventory</mat-icon>
+                <span>Lotes de <strong>{{ produtoSelecionado.nome }}</strong></span>
+                <button class="btn-fechar" (click)="produtoSelecionado = null; lotes = []">
+                    <mat-icon>close</mat-icon>
+                </button>
+            </div>
+
+            <div *ngIf="carregandoLotes" class="lotes-loading">
+                <mat-spinner diameter="30"></mat-spinner>
+                <span>Carregando lotes...</span>
+            </div>
+
+            <div *ngIf="!carregandoLotes && lotes.length === 0" class="lotes-vazio">
+                Nenhum lote encontrado para este produto.
+            </div>
+
+            <table *ngIf="!carregandoLotes && lotes.length > 0" class="lotes-table" mat-table [dataSource]="lotes">
+
+                <ng-container matColumnDef="numeroLote">
+                    <th class="th-table" mat-header-cell *matHeaderCellDef>Nº Lote</th>
+                    <td class="td-table" mat-cell *matCellDef="let l">{{ l.numeroLote }}</td>
+                </ng-container>
+
+                <ng-container matColumnDef="quantidadeAtual">
+                    <th class="th-table" mat-header-cell *matHeaderCellDef>Quantidade</th>
+                    <td class="td-table" mat-cell *matCellDef="let l">{{ l.quantidadeAtual }} {{
+                        produtoSelecionado!.unidadeMedida }}</td>
+                </ng-container>
+
+                <ng-container matColumnDef="precoCusto">
+                    <th class="th-table" mat-header-cell *matHeaderCellDef>Preço Custo</th>
+                    <td class="td-table" mat-cell *matCellDef="let l">{{ l.precoCusto | currency:'BRL' }}</td>
+                </ng-container>
+
+                <ng-container matColumnDef="dataEntrada">
+                    <th class="th-table" mat-header-cell *matHeaderCellDef>Entrada</th>
+                    <td class="td-table" mat-cell *matCellDef="let l">{{ l.dataEntrada | date:'dd/MM/yyyy' }}</td>
+                </ng-container>
+
+                <ng-container matColumnDef="dataValidade">
+                    <th class="th-table" mat-header-cell *matHeaderCellDef>Validade</th>
+                    <td class="td-table" mat-cell *matCellDef="let l">{{ l.dataValidade ? (l.dataValidade |
+                        date:'dd/MM/yyyy') : '—' }}</td>
+                </ng-container>
+
+                <ng-container matColumnDef="statusLote">
+                    <th class="th-table" mat-header-cell *matHeaderCellDef>Status</th>
+                    <td class="td-table" mat-cell *matCellDef="let l">
+                        <span class="status-badge" [ngClass]="loteStatusClass(l.status)">{{ l.status }}</span>
+                    </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="lotesColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: lotesColumns;"></tr>
+            </table>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,81 @@
+<app-menu />
+<div class="container-fluid pt-3">
+    <div class="page-header">
+        <div class="page-title">
+            <div class="icon">💰</div>
+            <div>
+                <h1>Formas de pagamento</h1>
+                <h2 class="subtitle">Gerencie as formas de pagamento, adicionando ou editando</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <app-button class="float-end" (click)="addModalFP()" textButton="+ cadastrar"></app-button>
+            <mat-form-field>
+                <mat-label>Filtro</mat-label>
+                <input matInput (keyup)="aplicarFilto($event)" placeholder="Digite sua busca" #input>
+            </mat-form-field>
+
+            <table class="mat-elevation-z8" mat-table [dataSource]="dataSource" matSort>
+
+                <ng-container matColumnDef="id">
+                    <th class="th-table" mat-header-cell *matHeaderCellDef mat-sort-header> ID </th>
+                    <td class="td-table" mat-cell *matCellDef="let fp"> {{fp.idFormaPagamento}} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="nome">
+                    <th class="th-table" mat-header-cell *matHeaderCellDef mat-sort-header> Nome </th>
+                    <td class="td-table" mat-cell *matCellDef="let fp"> {{fp.descricao}} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="ativo">
+                    <th class="th-table" mat-header-cell *matHeaderCellDef mat-sort-header> Status </th>
+                    <td class="td-table" mat-cell *matCellDef="let fp">
+                        <!-- forma antes da versão 17
+                        <mat-icon class="c-primary" *ngIf="user.ativo">check</mat-icon>
+                        <mat-icon class="c-error"*ngIf="!user.ativo">remove</mat-icon> -->
+                        @if(fp.ativo){
+                        <mat-icon class="c-primary">check</mat-icon>
+                        }@else {
+                        <mat-icon class="c-error">remove</mat-icon>
+                        }
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="action">
+                    <th class="th-table" style="width: 12%;" mat-header-cell *matHeaderCellDef mat-sort-header> </th>
+                    <td class="td-table" mat-cell *matCellDef="let fp">
+                        <mat-icon class="icone-tabela" (click)="openModalEditForma(fp)">edit</mat-icon>
+                    </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+                <!-- Row shown when there is no matching data. -->
+                <tr class="mat-row" *matNoDataRow>
+                    <td class="mat-cell no-data" colspan="4">Nenhuma forma de pagamento encontrada para a pesquisa
+                        "{{input.value}}"
+                    </td>
+                </tr>
+            </table>
+
+            <mat-paginator class="shadow-sm" [pageSizeOptions]="[10, 15, 25]"
+                aria-label="Selecione quantidade de formas de pagamento por página"></mat-paginator>
+        </div>
+    </div>
+</div>
+
+<!--<div *ngIf="usuarios.length > 0; else semUsuarios">
+    <h3>Lista de Usuários</h3>
+    <ul>
+        <li *ngFor="let usuario of usuarios">
+            {{usuario.id}} - {{ usuario.nome }} - {{usuario.username}}
+        </li>
+    </ul>
+</div>
+<ng-template #semUsuarios>
+    <p>Carregando ou sem usuários cadastrados.</p>
+</ng-template>-->

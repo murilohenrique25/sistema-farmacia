@@ -1,0 +1,17 @@
+<div class="area-login-background"></div>
+<div class="area-form">
+    <form>
+        <h1 class="title">EntregaJá</h1>
+        <h2 class="subtitle">Mais eficiencia no controle de entregas</h2>
+
+        <input [(ngModel)]="username" [ngModelOptions]="{standalone: true}" class="input-form" type="text"
+            placeholder="Usuário">
+        <input [(ngModel)]="password" [ngModelOptions]="{standalone: true}" class="input-form" type="password"
+            placeholder="Senha">
+
+        <app-button textButton="Acessar" size="full" (click)="login()"></app-button>
+    </form>
+
+    <p class="footer">©️ 2024 | Desenvolvido por <a href="https://www.instagram.com/starks.tecnologia" target="_blank"
+            rel="noopener noreferrer">Starks Tecnologia</a></p>
+</div>

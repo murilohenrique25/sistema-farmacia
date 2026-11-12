@@ -1,0 +1,32 @@
+<div class="container-fluid p-3">
+    <mat-icon (click)="cancel()" class="float-end hover">close</mat-icon>
+
+    <h1 class="title">Informe o intervalo de datas para carregas as entregas</h1>
+    <form>
+        <app-date-picker (dateRangeSelected)="onDateRangeChange($event)"></app-date-picker>
+
+        <mat-form-field class="w-100">
+            <mat-label>Entregador</mat-label>
+            <mat-select name="entregador" [(ngModel)]="selectedEntregadores" multiple>
+                @for (entregador of listEntregador; track entregador) {
+                <mat-option [value]="entregador.idEntregador">{{entregador.nome}}</mat-option>
+                }
+            </mat-select>
+        </mat-form-field>
+
+        <mat-form-field class="w-100">
+            <mat-label>Status</mat-label>
+            <mat-select name="status" [(ngModel)]="selectedStatus" multiple>
+                @for (status of listStatus; track status) {
+                <mat-option [value]="status.valor">{{status.descricao}}</mat-option>
+                }
+            </mat-select>
+        </mat-form-field>
+    </form>
+    <div class="flex col-12 buttons">
+        <div class="col-12">
+            <app-button (click)="applyFilters()" textButton="Aplicar Filtros"></app-button>
+            <app-button class="float-end" (click)="cancel()" textButton="Cancelar"></app-button>
+        </div>
+    </div>
+</div>

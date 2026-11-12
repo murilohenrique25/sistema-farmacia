@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Rastrear Entrega · EntregaJá</title>
+    <meta name="description" content="Acompanhe sua entrega em tempo real." />
+
+    <!-- Leaflet — mapa gratuito, sem chave de API -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <style>
+        /* ─── Reset ─────────────────────────────────────────── */
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --g1: #6a11cb;
+            --g2: #2575fc;
+            --surface: #fff;
+            --bg: #f0f2f8;
+            --text: #1f2937;
+            --muted: #6b7280;
+            --border: #e5e7eb;
+            --green: #10b981;
+            --orange: #f59e0b;
+            --red: #ef4444;
+            --r-lg: 18px;
+            --r-md: 12px;
+            --sh-md: 0 4px 20px rgba(0, 0, 0, .09);
+            --sh-lg: 0 8px 40px rgba(0, 0, 0, .13);
+        }
+
+        html,
+        body {
+            min-height: 100vh;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ─── Layout ─────────────────────────────────────────── */
+        .page {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ─── Header ─────────────────────────────────────────── */
+        header {
+            background: linear-gradient(135deg, var(--g1) 0%, var(--g2) 100%);
+            padding: 18px 24px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, .18);
+        }
+
+        .logo-wrap {
+            width: 44px;
+            height: 44px;
+            background: rgba(255, 255, 255, .18);
+            border-radius: 13px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+        }
+
+        .logo-info h1 {
+            color: #fff;
+            font-size: 17px;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+
+        .logo-info p {
+            color: rgba(255, 255, 255, .7);
+            font-size: 12px;
+            margin-top: 2px;
+        }
+
+        /* ─── Main ───────────────────────────────────────────── */
+        main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 36px 16px 48px;
+            gap: 20px;
+        }
+
+        /* ─── Hero ───────────────────────────────────────────── */
+        .hero {
+            text-align: center;
+            max-width: 460px;
+        }
+
+        .hero h2 {
+            font-size: 22px;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--g1), var(--g2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 6px;
+        }
+
+        .hero p {
+            font-size: 14px;
+            color: var(--muted);
+        }
+
+        /* ─── Search card ────────────────────────────────────── */
+        .search-card {
+            background: var(--surface);
+            border-radius: var(--r-lg);
+            box-shadow: var(--sh-md);
+            padding: 26px 24px;
+            width: 100%;
+            max-width: 460px;
+        }
+
+        .field-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--muted);
+            margin-bottom: 8px;
+            letter-spacing: .3px;
+            text-transform: uppercase;
+        }
+
+        .input-row {
+            display: flex;
+            gap: 8px;
+        }
+
+        .input-row input {
+            flex: 1;
+            border: 1.5px solid var(--border);
+            border-radius: var(--r-md);
+            padding: 13px 16px;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text);
+            outline: none;
+            transition: border-color .2s, box-shadow .2s;
+            -moz-appearance: textfield;
+        }
+
+        .input-row input::-webkit-outer-spin-button,
+        .input-row input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+        }
+
+        .input-row input:focus {
+            border-color: var(--g1);
+            box-shadow: 0 0 0 3px rgba(106, 17, 203, .10);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--g1), var(--g2));
+            color: #fff;
+            border: none;
+            border-radius: var(--r-md);
+            padding: 13px 22px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: opacity .2s, transform .1s;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            letter-spacing: .2px;
+        }
+
+        .btn-primary:hover {
+            opacity: .90;
+        }
+
+        .btn-primary:active {
+            transform: scale(.97);
+        }
+
+        .btn-primary:disabled {
+            opacity: .5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* ─── Feedback ───────────────────────────────────────── */
+        .feedback {
+            width: 100%;
+            max-width: 460px;
+            border-radius: var(--r-md);
+            padding: 14px 18px;
+            font-size: 14px;
+            font-weight: 500;
+            display: none;
+            align-items: flex-start;
+            gap: 10px;
+            line-height: 1.5;
+        }
+
+        .feedback.show {
+            display: flex;
+        }
+
+        .feedback.error {
+            background: #fef2f2;
+            border: 1.5px solid #fca5a5;
+            color: #b91c1c;
+        }
+
+        .feedback.warning {
+            background: #fffbeb;
+            border: 1.5px solid #fcd34d;
+            color: #92400e;
+        }
+
+        .feedback .fi {
+            font-size: 18px;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+        /* ─── Entrega card ───────────────────────────────────── */
+        .entrega-card {
+            background: var(--surface);
+            border-radius: var(--r-lg);
+            box-shadow: var(--sh-md);
+            width: 100%;
+            max-width: 460px;
+            overflow: hidden;
+            display: none;
+        }
+
+        .entrega-card.show {
+            display: block;
+        }
+
+        .ec-header {
+            background: linear-gradient(135deg, var(--g1), var(--g2));
+            padding: 18px 20px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .ec-icon {
+            width: 46px;
+            height: 46px;
+            background: rgba(255, 255, 255, .18);
+            border-radius: 13px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            flex-shrink: 0;
+        }
+
+        .ec-info h3 {
+            color: #fff;
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .ec-info p {
+            color: rgba(255, 255, 255, .72);
+            font-size: 12px;
+            margin-top: 3px;
+        }
+
+        .badge-rota {
+            margin-left: auto;
+            flex-shrink: 0;
+            background: rgba(255, 255, 255, .18);
+            border: 1.5px solid rgba(255, 255, 255, .30);
+            color: #fff;
+            border-radius: 999px;
+            padding: 5px 12px;
+            font-size: 12px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #4ade80;
+            animation: beat 1.4s ease-in-out infinite;
+        }
+
+        @keyframes beat {
+
+            0%,
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            50% {
+                transform: scale(1.6);
+                opacity: .5;
+            }
+        }
+
+        .ec-body {
+            padding: 0 20px;
+        }
+
+        .ec-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 13px 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 13px;
+        }
+
+        .ec-row:last-child {
+            border-bottom: none;
+        }
+
+        .ec-row .lbl {
+            color: var(--muted);
+            min-width: 130px;
+            flex-shrink: 0;
+        }
+
+        .ec-row .val {
+            font-weight: 600;
+            word-break: break-all;
+        }
+
+        .ec-row .ico {
+            font-size: 15px;
+            flex-shrink: 0;
+        }
+
+        /* ─── Countdown ──────────────────────────────────────── */
+        .countdown-bar {
+            width: 100%;
+            max-width: 460px;
+            background: var(--surface);
+            border-radius: var(--r-md);
+            box-shadow: var(--sh-md);
+            padding: 10px 18px;
+            display: none;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+            color: var(--muted);
+        }
+
+        .countdown-bar.show {
+            display: flex;
+        }
+
+        .progress-track {
+            flex: 1;
+            height: 4px;
+            background: var(--border);
+            border-radius: 999px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 999px;
+            background: linear-gradient(90deg, var(--g1), var(--g2));
+            transition: width .3s linear;
+        }
+
+        /* ─── Map wrapper ────────────────────────────────────── */
+        .map-wrap {
+            width: 100%;
+            max-width: 680px;
+            border-radius: var(--r-lg);
+            box-shadow: var(--sh-lg);
+            overflow: hidden;
+            display: none;
+        }
+
+        .map-wrap.show {
+            display: block;
+        }
+
+        .map-bar {
+            background: var(--surface);
+            padding: 12px 18px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .map-bar-left {
+            font-weight: 700;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+
+        .map-bar-right {
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        #map {
+            width: 100%;
+            height: 380px;
+        }
+
+        /* ─── Spinner ────────────────────────────────────────── */
+        .spin {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border: 2.5px solid rgba(255, 255, 255, .35);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: rot .65s linear infinite;
+        }
+
+        @keyframes rot {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* ─── Footer ─────────────────────────────────────────── */
+        footer {
+            text-align: center;
+            padding: 20px;
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        footer a {
+            color: var(--g1);
+            text-decoration: none;
+        }
+
+        /* ─── Responsive ─────────────────────────────────────── */
+        @media (max-width: 480px) {
+            .input-row {
+                flex-direction: column;
+            }
+
+            .btn-primary {
+                justify-content: center;
+            }
+
+            #map {
+                height: 300px;
+            }
+
+            .ec-row .lbl {
+                min-width: 100px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="page">
+
+        <!-- ── Header ── -->
+        <header>
+            <div class="logo-wrap">🛵</div>
+            <div class="logo-info">
+                <h1>EntregaJá · Rastreamento</h1>
+                <p>Acompanhe seu pedido em tempo real</p>
+            </div>
+        </header>
+
+        <!-- ── Main ── -->
+        <main>
+
+            <!-- Hero -->
+            <div class="hero">
+                <h2>Onde está minha entrega?</h2>
+                <p>Digite o código do pedido e veja a posição do entregador no mapa.</p>
+            </div>
+
+            <!-- Busca -->
+            <div class="search-card">
+                <label class="field-label" for="inp-codigo">Código da entrega</label>
+                <div class="input-row">
+                    <input id="inp-codigo" type="number" min="1" placeholder="Ex: 1042" autofocus inputmode="numeric"
+                        autocomplete="off" />
+                    <button class="btn-primary" id="btn" onclick="rastrear()">
+                        <span id="btn-inner">🔍&nbsp; Rastrear</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Feedback -->
+            <div class="feedback" id="feedback">
+                <span class="fi" id="fi">ℹ️</span>
+                <span id="fm"></span>
+            </div>
+
+            <!-- Card da entrega -->
+            <div class="entrega-card" id="ec">
+                <div class="ec-header">
+                    <div class="ec-icon">📦</div>
+                    <div class="ec-info">
+                        <h3 id="ec-titulo">Entrega #–</h3>
+                        <p id="ec-sub">Carregando…</p>
+                    </div>
+                    <div class="badge-rota">
+                        <div class="dot"></div>Em rota
+                    </div>
+                </div>
+                <div class="ec-body">
+                    <div class="ec-row">
+                        <span class="ico">🕐</span>
+                        <span class="lbl">Última posição</span>
+                        <span class="val" id="ec-hora">–</span>
+                    </div>
+                    <div class="ec-row">
+                        <span class="ico">📍</span>
+                        <span class="lbl">Coordenadas</span>
+                        <span class="val" id="ec-coords">–</span>
+                    </div>
+                    <div class="ec-row">
+                        <span class="ico">🔄</span>
+                        <span class="lbl">Atualização</span>
+                        <span class="val">A cada 5 segundos</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Countdown bar -->
+            <div class="countdown-bar" id="cdb">
+                <span>Próxima atualização</span>
+                <div class="progress-track">
+                    <div class="progress-fill" id="prog" style="width:100%"></div>
+                </div>
+                <span id="cdb-secs">5s</span>
+            </div>
+
+            <!-- Mapa -->
+            <div class="map-wrap" id="mw">
+                <div class="map-bar">
+                    <div class="map-bar-left"><span>🗺️</span> Posição do entregador</div>
+                    <div class="map-bar-right" id="map-bar-info">–</div>
+                </div>
+                <div id="map"></div>
+            </div>
+
+        </main>
+
+        <footer>
+            © EntregaJá · <a href="https://sienixsistemas.com.br" target="_blank">Sienix Sistemas</a>
+            &nbsp;·&nbsp; Rastreamento seguro em tempo real
+        </footer>
+    </div>
+
+    <script>
+        /* ── Configuração ─────────────────────────────────────── */
+        const API = 'https://tomcat.vps6912.panel.icontainer.net:8443/control-api';
+        const INTERVALO = 5;   // segundos
+
+        /* ── Estado ───────────────────────────────────────────── */
+        let mapa = null;
+        let marcador = null;
+        let intervalo = null;
+        let cdTimer = null;
+        let cdRestante = INTERVALO;
+        let idEntrega = null;
+
+        /* ── Elementos ────────────────────────────────────────── */
+        const inp = document.getElementById('inp-codigo');
+        const btn = document.getElementById('btn');
+        const btnIn = document.getElementById('btn-inner');
+        const fbEl = document.getElementById('feedback');
+        const fiEl = document.getElementById('fi');
+        const fmEl = document.getElementById('fm');
+        const ecEl = document.getElementById('ec');
+        const mwEl = document.getElementById('mw');
+        const cdbEl = document.getElementById('cdb');
+        const progEl = document.getElementById('prog');
+        const cdbSecs = document.getElementById('cdb-secs');
+
+        inp.addEventListener('keydown', e => { if (e.key === 'Enter') rastrear(); });
+
+        /* ── UI helpers ───────────────────────────────────────── */
+        function feedback(tipo, icon, msg) {
+            fbEl.className = `feedback show ${tipo}`;
+            fiEl.textContent = icon;
+            fmEl.textContent = msg;
+        }
+        function clearFeedback() { fbEl.className = 'feedback'; }
+
+        function setBusy(on) {
+            btn.disabled = on;
+            btnIn.innerHTML = on ? '<span class="spin"></span>' : '🔍&nbsp; Rastrear';
+        }
+
+        function hora(val) {
+            if (!val) return '–';
+            let d;
+            // Jackson serializa LocalDateTime como array [ano, mes, dia, h, m, s, nano]
+            if (Array.isArray(val)) {
+                const [ano, mes, dia, h, m, s] = val;
+                d = new Date(ano, mes - 1, dia, h, m, s);
+            } else {
+                d = new Date(val);
+            }
+            if (isNaN(d.getTime())) return '–';
+            return d.toLocaleTimeString('pt-BR', {
+                hour: '2-digit', minute: '2-digit', second: '2-digit'
+            });
+        }
+
+        /* ── Countdown bar ────────────────────────────────────── */
+        function iniciarCountdown() {
+            pararCountdown();
+            cdRestante = INTERVALO;
+            cdbEl.classList.add('show');
+
+            cdTimer = setInterval(() => {
+                cdRestante = Math.max(0, cdRestante - 0.3);
+                const pct = (cdRestante / INTERVALO) * 100;
+                progEl.style.width = pct + '%';
+                cdbSecs.textContent = Math.ceil(cdRestante) + 's';
+            }, 300);
+        }
+        function resetCountdown() {
+            cdRestante = INTERVALO;
+        }
+        function pararCountdown() {
+            if (cdTimer) { clearInterval(cdTimer); cdTimer = null; }
+            cdbEl.classList.remove('show');
+        }
+
+        /* ── Mapa ─────────────────────────────────────────────── */
+        function criarIcone() {
+            return L.divIcon({
+                className: '',
+                html: `<div style="
+        width:40px;height:40px;
+        background:linear-gradient(135deg,#6a11cb,#2575fc);
+        border:3px solid #fff;
+        border-radius:50% 50% 50% 0;
+        transform:rotate(-45deg);
+        box-shadow:0 4px 14px rgba(0,0,0,.30);
+        display:flex;align-items:center;justify-content:center;
+      "><span style="transform:rotate(45deg);font-size:18px">🛵</span></div>`,
+                iconSize: [40, 40],
+                iconAnchor: [20, 40],
+                popupAnchor: [0, -44],
+            });
+        }
+
+        function posicionarMapa(lat, lng) {
+            if (!mapa) {
+                mapa = L.map('map', { zoomControl: true });
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    maxZoom: 19,
+                    attribution: '© <a href="https://openstreetmap.org">OpenStreetMap</a>'
+                }).addTo(mapa);
+
+                marcador = L.marker([lat, lng], { icon: criarIcone() })
+                    .addTo(mapa)
+                    .bindPopup('<strong>Entregador</strong><br>Posição atual')
+                    .openPopup();
+
+                mapa.setView([lat, lng], 16);
+            } else {
+                marcador.setLatLng([lat, lng]);
+                mapa.panTo([lat, lng], { animate: true, duration: 0.6 });
+            }
+            setTimeout(() => mapa.invalidateSize(), 120);
+        }
+
+        /* ── API ──────────────────────────────────────────────── */
+        async function buscar(id) {
+            const r = await fetch(
+                `${API}/api/v1/entrega-localizacao/${id}/localizacao-atual`,
+                { cache: 'no-store' }
+            );
+            if (r.status === 204) return null;
+            if (!r.ok) throw new Error(`HTTP ${r.status}`);
+            return r.json();
+        }
+
+        /* ── Atualização periódica ────────────────────────────── */
+        async function tick() {
+            resetCountdown();
+            try {
+                const d = await buscar(idEntrega);
+
+                if (!d) {
+                    // Entrega saiu de rota
+                    pararTudo();
+                    feedback('warning', '✅',
+                        'A entrega foi finalizada ou não está mais em rota no momento.');
+                    ecEl.classList.remove('show');
+                    mwEl.classList.remove('show');
+                    return;
+                }
+
+                // Atualizar card
+                document.getElementById('ec-titulo').textContent = `Entrega #${d.idEntrega}`;
+                document.getElementById('ec-sub').textContent = 'Entregador a caminho 🏍️';
+                document.getElementById('ec-hora').textContent = hora(d.atualizadoEm);
+                document.getElementById('ec-coords').textContent =
+                    `${d.latitude.toFixed(6)}, ${d.longitude.toFixed(6)}`;
+                document.getElementById('map-bar-info').textContent =
+                    `Atualizado às ${hora(d.atualizadoEm)}`;
+
+                ecEl.classList.add('show');
+                mwEl.classList.add('show');
+                clearFeedback();
+
+                posicionarMapa(d.latitude, d.longitude);
+
+            } catch (e) {
+                document.getElementById('map-bar-info').textContent = 'Erro ao atualizar';
+                console.error(e);
+            }
+        }
+
+        /* ── Parar tudo ───────────────────────────────────────── */
+        function pararTudo() {
+            if (intervalo) { clearInterval(intervalo); intervalo = null; }
+            pararCountdown();
+        }
+
+        /* ── Ação principal ───────────────────────────────────── */
+        async function rastrear() {
+            const val = inp.value.trim();
+            if (!val || isNaN(+val) || +val <= 0) {
+                feedback('error', '⚠️', 'Digite um código de entrega válido.');
+                return;
+            }
+
+            pararTudo();
+            setBusy(true);
+            clearFeedback();
+            ecEl.classList.remove('show');
+            mwEl.classList.remove('show');
+            idEntrega = +val;
+
+            try {
+                const d = await buscar(idEntrega);
+
+                if (!d) {
+                    feedback('warning', '📦',
+                        'Entrega não encontrada ou não está em rota no momento. ' +
+                        'Verifique o código e tente novamente.');
+                    setBusy(false);
+                    return;
+                }
+
+                setBusy(false);
+                await tick();
+                iniciarCountdown();
+
+                // Polling a cada 5 s
+                intervalo = setInterval(async () => {
+                    await tick();
+                    iniciarCountdown();
+                }, INTERVALO * 1000);
+
+            } catch (e) {
+                setBusy(false);
+                feedback('error', '❌',
+                    'Não foi possível conectar ao servidor. Verifique sua conexão e tente novamente.');
+                console.error(e);
+            }
+        }
+
+        // Parar polling ao sair/fechar aba (economiza recursos)
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                pararTudo();
+            } else if (idEntrega && intervalo === null) {
+                // Retomou — reinicia
+                tick();
+                iniciarCountdown();
+                intervalo = setInterval(async () => {
+                    await tick();
+                    iniciarCountdown();
+                }, INTERVALO * 1000);
+            }
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,85 @@
+<app-menu />
+<div class="container-fluid pt-3">
+
+    <div class="page-header">
+        <div class="page-title">
+            <div class="icon">{{ icone }}</div>
+            <div>
+                <h1>{{ titulo }}</h1>
+                <h2 class="subtitle">Gerencie as contas, registre pagamentos e acompanhe registros</h2>
+            </div>
+        </div>
+    </div>
+
+    <div *ngIf="carregando" class="loading-overlay">
+        <div class="spinner"></div>
+        <p>Carregando...</p>
+    </div>
+
+    <div *ngIf="!carregando">
+        <div class="row mb-2 align-items-center">
+            <div class="col">
+                <div class="table-toolbar">
+                    <mat-icon>search</mat-icon>
+                    <input type="text" placeholder="Buscar descrição, categoria..." (keyup)="aplicarFiltro($event)"
+                        #input />
+                </div>
+            </div>
+            <div class="col-auto">
+                <button class="botao-primario" (click)="abrirModal()">
+                    <mat-icon>add</mat-icon> Nova conta
+                </button>
+            </div>
+        </div>
+
+        <table class="mat-elevation-z8" mat-table [dataSource]="dataSource" matSort>
+
+            <ng-container matColumnDef="descricao">
+                <th class="th-table" mat-header-cell *matHeaderCellDef mat-sort-header>Descrição</th>
+                <td class="td-table" mat-cell *matCellDef="let c">{{ c.descricao }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="categoria">
+                <th class="th-table" mat-header-cell *matHeaderCellDef mat-sort-header>Categoria</th>
+                <td class="td-table" mat-cell *matCellDef="let c">{{ c.categoria || '—' }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="valor">
+                <th class="th-table" mat-header-cell *matHeaderCellDef mat-sort-header>Valor</th>
+                <td class="td-table" mat-cell *matCellDef="let c">{{ c.valor | currency:'BRL' }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="dataVencimento">
+                <th class="th-table" mat-header-cell *matHeaderCellDef mat-sort-header>Data Cadastro</th>
+                <td class="td-table" mat-cell *matCellDef="let c">{{ c.dataVencimento | date:'dd/MM/yyyy' }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="status">
+                <th class="th-table" mat-header-cell *matHeaderCellDef mat-sort-header>Status</th>
+                <td class="td-table" mat-cell *matCellDef="let c">
+                    <span class="status-badge" [ngClass]="statusClass(c.status)">{{ c.status }}</span>
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="action">
+                <th class="th-table" mat-header-cell *matHeaderCellDef></th>
+                <td class="td-table" mat-cell *matCellDef="let c">
+                    <mat-icon class="icone-tabela" title="Editar" (click)="abrirModal(c)">edit</mat-icon>
+                    <mat-icon class="icone-tabela c-primary" title="Dar baixa"
+                        *ngIf="c.status === 'PENDENTE' || c.status === 'VENCIDO'"
+                        (click)="baixar(c)">check_circle</mat-icon>
+                    <mat-icon class="icone-tabela c-error" title="Cancelar"
+                        *ngIf="c.status !== 'CANCELADO' && c.status !== 'PAGO'" (click)="cancelar(c)">cancel</mat-icon>
+                </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+            <tr class="mat-row" *matNoDataRow>
+                <td class="mat-cell no-data" colspan="6">Nenhuma conta encontrada para "{{ input.value }}"</td>
+            </tr>
+        </table>
+
+        <mat-paginator [pageSizeOptions]="[10, 20, 50]" aria-label="Itens por página"></mat-paginator>
+    </div>
+</div>

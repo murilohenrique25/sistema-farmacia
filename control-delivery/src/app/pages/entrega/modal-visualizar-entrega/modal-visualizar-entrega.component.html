@@ -1,0 +1,134 @@
+<mat-tab-group>
+    <mat-tab>
+        <ng-template mat-tab-label>
+            <mat-icon class="example-tab-icon">list_alt</mat-icon>
+            Entrega
+        </ng-template>
+
+        <div class="row mt-3 dados-entrega">
+            <h1 class="title">Detalhes da entrega</h1>
+            <h2 class="subtitle">Visualize os dados detalhados da entrega</h2>
+
+            <div class="col-6">
+                <h4 class="title-information">Id</h4>
+                <p class="information">{{entregaData.idEntrega}}</p>
+            </div>
+            <div class="col-6">
+                <h4 class="title-information">Cupom/Orçamento</h4>
+                <p class="information">{{entregaData.cupomOrcamento}}</p>
+            </div>
+            <div class="col-6">
+                <h4 class="title-information">Status Entrega</h4>
+                <p class="information">{{entregaData.statusEntrega}}</p>
+            </div>
+            <div class="col-6">
+                <h4 class="title-information">Vendedor</h4>
+                <p class="information">{{entregaData.nomeUser}}</p>
+            </div>
+            <div class="col-6">
+                <h4 class="title-information">Data Cadastro</h4>
+                <p class="information" *ngIf="entregaData.dataCadastroEntrega">{{entregaData.dataCadastroEntrega |
+                    dateTimeFormat}}</p>
+            </div>
+            <div class="col-6">
+                <h4 class="title-information">Forma Pagamento</h4>
+                <p class="information">{{entregaData.formaPagamento}}</p>
+            </div>
+            <div class="col-6">
+                <h4 class="title-information">Valor Total</h4>
+                <p class="information" *ngIf="entregaData.valorTotal">{{entregaData.valorTotal | moeda}}</p>
+            </div>
+            <div class="col-6">
+                <h4 class="title-information">Valor Recebido</h4>
+                <p class="information" *ngIf="entregaData.valorReceber">{{entregaData.valorReceber | moeda}}</p>
+            </div>
+            <div class="col-6">
+                <h4 class="title-information">Troco</h4>
+                <p class="information" *ngIf="entregaData.troco">{{entregaData.troco | moeda}}</p>
+                <p class="information" *ngIf="!entregaData.troco"> - </p>
+            </div>
+            <div class="col-6">
+                <h4 class="title-information">Tipo Entrega</h4>
+                <p class="information">{{entregaData.tipoEntrega}}</p>
+            </div>
+            <div class="col-6">
+                <h4 class="title-information">Whatsapp</h4>
+                <p class="information">{{entregaData.telefone}}</p>
+            </div>
+            <div class="col-6">
+                <h4 class="title-information">Observação</h4>
+                <p class="information" *ngIf="entregaData.observacao">{{entregaData.observacao}}</p>
+                <p class="information" *ngIf="!entregaData.observacao"> - </p>
+            </div>
+        </div>
+    </mat-tab>
+
+    <mat-tab>
+        <ng-template mat-tab-label>
+            <mat-icon class="example-tab-icon">motorcycle</mat-icon>
+            Entregador
+        </ng-template>
+        <div class="row mt-3 dados-entrega">
+            <h1 class="title">Detalhes da entrega</h1>
+            <h2 class="subtitle">Visualize os dados detalhados do entregador</h2>
+
+            <div class="col-6">
+                <h4 class="title-information">Entregador</h4>
+                <p class="information" *ngIf="entregaData.nomeEntregador">{{entregaData.nomeEntregador}}</p>
+                <p class="information" *ngIf="!entregaData.nomeEntregador"> - </p>
+            </div>
+            <div class="col-6">
+                <h4 class="title-information">Data Início Entrega</h4>
+                <p class="information" *ngIf="entregaData.dataSelecaoEntrega">{{entregaData.dataSelecaoEntrega |
+                    dateTimeFormat}}</p>
+                <p class="information" *ngIf="!entregaData.dataSelecaoEntrega"> - </p>
+            </div>
+            <div class="col-6">
+                <h4 class="title-information">Data Finalização Entrega</h4>
+                <p class="information" *ngIf="entregaData.dataFinalizacaoEntrega">{{entregaData.dataFinalizacaoEntrega |
+                    dateTimeFormat}}</p>
+                <p class="information" *ngIf="!entregaData.dataFinalizacaoEntrega"> - </p>
+            </div>
+        </div>
+    </mat-tab>
+
+    <mat-tab>
+        <ng-template mat-tab-label>
+            <mat-icon class="example-tab-icon">edit_note</mat-icon>
+            Assinatura
+        </ng-template>
+
+        <div class="row mt-3 dados-entrega">
+            <h1 class="title">Detalhes da entrega</h1>
+            <h2 class="subtitle">Visualize os dados detalhados entrega</h2>
+
+            <div class="col-6">
+                <h4 class="title-information">Usuario Assinatura</h4>
+                <p class="information" *ngIf="entregaData.nomeUserAssinatura">{{entregaData.nomeUserAssinatura}}</p>
+                <p class="information" *ngIf="!entregaData.nomeUserAssinatura"> - </p>
+            </div>
+            <div class="col-6">
+                <h4 class="title-information">Data Assinatura</h4>
+                <p class="information" *ngIf="entregaData.dataAssinaturaEntrega">{{entregaData.dataAssinaturaEntrega |
+                    dateTimeFormat}}</p>
+                <p class="information" *ngIf="!entregaData.dataAssinaturaEntrega"> - </p>
+            </div>
+            <div class="col-6">
+                <h4 class="title-information">Latitude</h4>
+                <p class="information" *ngIf="entregaData.latitude">{{entregaData.latitude}}</p>
+                <p class="information" *ngIf="!entregaData.latitude"> - </p>
+            </div>
+            <div class="col-6">
+                <h4 class="title-information">Longitude</h4>
+                <p class="information" *ngIf="entregaData.longitude">{{entregaData.longitude}}</p>
+                <p class="information" *ngIf="!entregaData.longitude"> - </p>
+            </div>
+        </div>
+    </mat-tab>
+
+</mat-tab-group>
+<div class="flex col-12 buttons">
+    <div class="col-12">
+        <app-button class="float-end botao-fixo" (click)="fechar()" textButton="Fechar"></app-button>
+    </div>
+</div>

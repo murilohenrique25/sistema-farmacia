@@ -1,0 +1,43 @@
+<div class="container-fluid p-3">
+    <mat-icon (click)="closeModal()" class="float-end hover">close</mat-icon>
+
+    <h1 class="title">Detalhes do entregador</h1>
+    <h2 class="subtitle">Tenha uma visão mais detalhada do entregador</h2>
+
+    <div class="row mt-3">
+        <div class="col-6">
+            <h4 class="title-information">Id</h4>
+            <p class="information">{{entregadorData.idEntregador}}</p>
+        </div>
+        <div class="col-6">
+            <h4 class="title-information">Nome</h4>
+            <p class="information">{{entregadorData.nome}}</p>
+        </div>
+        <div class="col-6">
+            <h4 class="title-information">Usuário</h4>
+            <p class="information">{{entregadorData.usuario}}</p>
+        </div>
+        <div class="col-6">
+            <h4 class="title-information">CPF</h4>
+            <p class="information" *ngIf="entregadorData.cpf">{{entregadorData.cpf}}</p>
+            <p class="information" *ngIf="!entregadorData.cpf"> - </p>
+        </div>
+        <div class="col-6">
+            <h4 class="title-information">Turno</h4>
+            <p class="information">{{entregadorData.turno}}</p>
+        </div>
+        <div class="col-6">
+            <h4 class="title-information">Matriz</h4>
+            <p class="information">{{entregadorData.nomeMatriz ? entregadorData.nomeMatriz : ' - '}}</p>
+        </div>
+        <div class="col-6">
+            <h4 class="title-information">Ativo</h4>
+            <p class="information">{{entregadorData.ativo ? 'Ativo' : 'Desativado'}}</p>
+        </div>
+        <div class="col-6">
+            <h4 class="title-information">Telefone</h4>
+            <p class="information" *ngIf="entregadorData.telefone">{{entregadorData.telefone}}</p>
+            <p class="information" *ngIf="!entregadorData.telefone">-</p>
+        </div>
+    </div>
+</div>

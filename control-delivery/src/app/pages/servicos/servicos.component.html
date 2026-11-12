@@ -1,0 +1,68 @@
+<app-menu />
+<div class="container-fluid pt-3">
+<div class="page-header">
+        <div class="page-title">
+            <div class="icon">🛠️</div>
+            <div>
+                <h1>Lista de Serviços</h1>
+                <h2 class="subtitle">Verifique todos os serviços realizados</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <mat-form-field>
+                <mat-label>Filtro</mat-label>
+                <input matInput (keyup)="aplicarFilto($event)" placeholder="Digite sua busca" #input>
+            </mat-form-field>
+
+            <table class="mat-elevation-z8" mat-table [dataSource]="dataSource" matSort>
+
+                <ng-container matColumnDef="id">
+                    <th class="th-table" mat-header-cell *matHeaderCellDef mat-sort-header> Código </th>
+                    <td class="td-table" mat-cell *matCellDef="let servico"> {{servico.id}} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="userId">
+                    <th class="th-table" mat-header-cell *matHeaderCellDef mat-sort-header> Entregador </th>
+                    <td class="td-table" mat-cell *matCellDef="let servico"> {{servico.userId}} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="dataHoraInicioServico">
+                    <th class="th-table" mat-header-cell *matHeaderCellDef mat-sort-header> Data Início </th>
+                    <td class="td-table" mat-cell *matCellDef="let servico">
+                        {{ servico.dataHoraInicioServico | dateTimeFormat }}
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="dataHoraTerminoServico">
+                    <th class="th-table" mat-header-cell *matHeaderCellDef mat-sort-header> Data Término </th>
+                    <td class="td-table" mat-cell *matCellDef="let servico">
+                        {{ servico.dataHoraTerminoServico | dateTimeFormat }}
+                    </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+                <!-- Row shown when there is no matching data. -->
+                <tr class="mat-row" *matNoDataRow>
+                    <td class="mat-cell no-data" colspan="4">Nenhum serviço encontrado para a pesquisa
+                        "{{input.value}}"
+                    </td>
+                </tr>
+
+                <ng-container matColumnDef="action">
+                    <th class="th-table" mat-header-cell *matHeaderCellDef mat-sort-header> </th>
+                    <td class="td-table" mat-cell *matCellDef="let servico">
+                        <mat-icon class="icone-tabela" (click)="openModalViewServico(servico)">visibility</mat-icon>
+                    </td>
+                </ng-container>
+            </table>
+
+            <mat-paginator class="shadow-sm" [pageSizeOptions]="[10, 15, 25]"
+                aria-label="Selecione quantidade de serviços por página"></mat-paginator>
+        </div>
+    </div>
+</div>

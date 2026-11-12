@@ -1,0 +1,66 @@
+<app-menu></app-menu>
+
+<!-- HEADER DO MAPA -->
+<div class="map-header">
+    <div class="title">
+        🗺️ Mapa de Entregas
+        <span class="subtitle">
+            Exibindo apenas entregas <strong>concluídas</strong> com localização confirmada
+        </span>
+    </div>
+
+    <div class="actions">
+        <select title="Filtro Por Dia" (change)="filtrarPorDia($event)">
+            <option value="">Hoje ({{ entregas.length }})</option>
+            <option *ngFor="let dia of diasComQuantidade" [value]="dia.dia">
+                {{ dia.dia }} ({{ dia.quantidade }})
+            </option>
+        </select>
+
+        <button class="btn-secondary" (click)="mostrarModal = true">
+            📅 Filtro avançado
+        </button>
+    </div>
+</div>
+
+<!-- LAYOUT PRINCIPAL -->
+<div class="map-layout">
+
+    <!-- PAINEL LATERAL -->
+    <aside class="status-panel">
+        <h4>Resumo Operacional</h4>
+
+        <div class="status-item concluida">
+            📍 Concluídas no mapa
+            <strong>{{ entregas.length }}</strong>
+        </div>
+
+
+        <div class="info-box">
+            ℹ️ A localização é registrada no momento da conclusão da entrega.
+        </div>
+    </aside>
+
+    <!-- MAPA -->
+    <div id="mapa"></div>
+</div>
+
+<!-- MODAL DE FILTRO -->
+<div *ngIf="mostrarModal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Filtro avançado</h3>
+            <button class="close-btn" (click)="mostrarModal = false">✕</button>
+        </div>
+
+        <label>Data início</label>
+        <input type="date" [(ngModel)]="dataInicio">
+
+        <label>Data término</label>
+        <input type="date" [(ngModel)]="dataTermino">
+
+        <button style="font-weight: 500;" class="btn-primary" (click)="carregarEntregas()">
+            Aplicar filtro
+        </button>
+    </div>
+</div>

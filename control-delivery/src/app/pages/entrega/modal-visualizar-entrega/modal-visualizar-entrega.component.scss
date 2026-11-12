@@ -1,0 +1,49 @@
+.example-tab-icon {
+    margin-right: 8px;
+}
+
+.title {
+    font-size: 26px;
+    font-weight: 500;
+    padding: 0 0 0 15px;
+    margin: 0;
+    color: var(--primary-color);
+}
+
+.subtitle {
+    font-size: 16px;
+    font-weight: 300;
+    padding: 2px 0 14px 15px;
+    margin: 0;
+    color: var(--gray-color);
+}
+
+.title-information {
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--primary-color);
+    margin: 0;
+}
+
+.information {
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--gray-color);
+    margin-bottom: 20px;
+}
+
+.dados-entrega {
+    width: 95%;
+    margin-left: 15px;
+}
+
+.buttons {
+    padding-right: 15px;
+}
+
+.botao-fixo {
+    position: fixed;   /* Fixar o botão */
+    bottom: 55px;      /* Distância de 20px do fundo da tela */
+    left: 50%;         /* Centralizar horizontalmente */
+    transform: translateX(-50%); /* Ajustar para garantir que o botão esteja centralizado */
+  }

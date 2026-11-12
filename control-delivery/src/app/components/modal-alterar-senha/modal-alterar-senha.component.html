@@ -1,0 +1,38 @@
+<div class="container-fluid p-3">
+    <h1 class="title">🔐 Alterar Senha</h1>
+    <h2 class="subtitle">Por segurança, altere sua senha no primeiro acesso</h2>
+
+    <form [formGroup]="form" class="mt-3">
+        <div class="mb-3">
+            <mat-form-field class="w-100" appearance="outline">
+                <mat-label>Senha atual</mat-label>
+                <input matInput type="password" formControlName="password">
+                <mat-error>Informe a senha atual</mat-error>
+            </mat-form-field>
+        </div>
+
+        <div class="mb-3">
+            <mat-form-field class="w-100" appearance="outline">
+                <mat-label>Nova senha</mat-label>
+                <input matInput type="password" formControlName="novaSenha">
+                <mat-error>Mínimo 4 caracteres</mat-error>
+            </mat-form-field>
+        </div>
+
+        <div class="mb-3">
+            <mat-form-field class="w-100" appearance="outline">
+                <mat-label>Confirmar nova senha</mat-label>
+                <input matInput type="password" formControlName="confirmacaoSenha">
+                <mat-error>Confirme a nova senha</mat-error>
+            </mat-form-field>
+            <span class="erro-confirmacao" *ngIf="senhasNaoConferem">
+                As senhas não conferem
+            </span>
+        </div>
+
+        <button type="button" class="botao-primario w-100" [disabled]="form.invalid || senhasNaoConferem"
+            (click)="salvar()">
+            Alterar Senha
+        </button>
+    </form>
+</div>

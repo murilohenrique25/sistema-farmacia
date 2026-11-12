@@ -1,0 +1,116 @@
+<app-menu />
+<div class="container-fluid pt-3">
+
+    <div class="page-header">
+        <div class="page-title">
+            <div class="icon">📊</div>
+            <div>
+                <h1>Relatório de Estoque</h1>
+                <h2 class="subtitle">Posição atual e alertas de vencimento</h2>
+            </div>
+        </div>
+    </div>
+
+    <div *ngIf="carregando" class="loading-overlay">
+        <div class="spinner"></div>
+        <p>Carregando...</p>
+    </div>
+
+    <div *ngIf="!carregando">
+
+        <!-- Seção 1: Posição Atual do Estoque -->
+        <div class="section-header">
+            <h3>📊 Posição Atual do Estoque</h3>
+            <button class="botao-secundario" (click)="exportarPosicaoCsv()">
+                <mat-icon>download</mat-icon> Exportar CSV
+            </button>
+        </div>
+
+        <table class="mat-elevation-z8 mb-4" mat-table [dataSource]="posicaoDataSource">
+
+            <ng-container matColumnDef="nomeProduto">
+                <th class="th-table" mat-header-cell *matHeaderCellDef>Produto</th>
+                <td class="td-table" mat-cell *matCellDef="let p">{{ p.nomeProduto }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="codigo">
+                <th class="th-table" mat-header-cell *matHeaderCellDef>Código</th>
+                <td class="td-table" mat-cell *matCellDef="let p">{{ p.codigo }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="unidadeMedida">
+                <th class="th-table" mat-header-cell *matHeaderCellDef>Unidade</th>
+                <td class="td-table" mat-cell *matCellDef="let p">{{ p.unidadeMedida }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="quantidadeTotalAtiva">
+                <th class="th-table" mat-header-cell *matHeaderCellDef>Qtd. Total</th>
+                <td class="td-table" mat-cell *matCellDef="let p">{{ p.quantidadeTotalAtiva }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="numeroDeLotesAtivos">
+                <th class="th-table" mat-header-cell *matHeaderCellDef>Lotes Ativos</th>
+                <td class="td-table" mat-cell *matCellDef="let p">{{ p.numeroDeLotesAtivos }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="dataValidadeMaisProxima">
+                <th class="th-table" mat-header-cell *matHeaderCellDef>Validade Mais Próxima</th>
+                <td class="td-table" mat-cell *matCellDef="let p">
+                    {{ p.dataValidadeMaisProxima ? (p.dataValidadeMaisProxima | date:'dd/MM/yyyy') : '—' }}
+                </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="posicaoColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: posicaoColumns;"></tr>
+            <tr class="mat-row" *matNoDataRow>
+                <td class="mat-cell no-data" colspan="6">Nenhum produto encontrado</td>
+            </tr>
+        </table>
+
+        <mat-paginator #posicaoPaginator [pageSizeOptions]="[10, 20, 50]" aria-label="Itens por página"></mat-paginator>
+
+        <!-- Seção 2: Alertas de Vencimento -->
+        <div class="section-header mt-4">
+            <h3>⚠️ Alertas de Vencimento</h3>
+        </div>
+
+        <table class="mat-elevation-z8 mb-4" mat-table [dataSource]="alertasDataSource">
+
+            <ng-container matColumnDef="nomeProduto">
+                <th class="th-table" mat-header-cell *matHeaderCellDef>Produto</th>
+                <td class="td-table" mat-cell *matCellDef="let a">{{ a.nomeProduto }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="numeroLote">
+                <th class="th-table" mat-header-cell *matHeaderCellDef>Lote</th>
+                <td class="td-table" mat-cell *matCellDef="let a">{{ a.numeroLote }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="quantidadeAtual">
+                <th class="th-table" mat-header-cell *matHeaderCellDef>Quantidade</th>
+                <td class="td-table" mat-cell *matCellDef="let a">{{ a.quantidadeAtual }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="dataValidade">
+                <th class="th-table" mat-header-cell *matHeaderCellDef>Validade</th>
+                <td class="td-table" mat-cell *matCellDef="let a">{{ a.dataValidade | date:'dd/MM/yyyy' }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="statusAlerta">
+                <th class="th-table" mat-header-cell *matHeaderCellDef>Status</th>
+                <td class="td-table" mat-cell *matCellDef="let a">
+                    <span class="status-badge" [ngClass]="alertaClass(a.statusAlerta)">{{ a.statusAlerta }}</span>
+                </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="alertasColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: alertasColumns;"></tr>
+            <tr class="mat-row" *matNoDataRow>
+                <td class="mat-cell no-data" colspan="5">Nenhum alerta de vencimento nos próximos 30 dias</td>
+            </tr>
+        </table>
+
+        <mat-paginator #alertasPaginator [pageSizeOptions]="[10, 20, 50]" aria-label="Itens por página"></mat-paginator>
+
+    </div>
+</div>

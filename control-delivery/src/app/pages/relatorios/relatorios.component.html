@@ -1,0 +1,71 @@
+<app-menu />
+<div class="container-fluid pt-3">
+    <div class="page-header">
+        <div class="page-title">
+            <div class="icon">📊</div>
+            <div>
+                <h1>Relatórios</h1>
+                <h2 class="subtitle">Selecione o período, status e opcionalmente os entregadores.
+                    Em seguida escolha o tipo de relatório.</h2>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <section class="filtros-card">
+            <div class="filtros-grid">
+
+                <div class="campo">
+                    <app-date-picker (dateRangeSelected)="onDateRangeChange($event)">
+                    </app-date-picker>
+                </div>
+
+                <div class="campo">
+                    <mat-form-field appearance="outline" class="w-100">
+                        <mat-label>Status (obrigatório)</mat-label>
+                        <mat-select [(ngModel)]="selectedStatus" multiple>
+                            @for (status of listStatus; track status) {
+                            <mat-option [value]="status.valor">
+                                {{ status.descricao }}
+                            </mat-option>
+                            }
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+
+                <div class="campo">
+                    <mat-form-field appearance="outline" class="w-100">
+                        <mat-label>Entregadores (opcional)</mat-label>
+                        <mat-select [(ngModel)]="selectedEntregadores" multiple>
+                            @for (entregador of listEntregador; track entregador) {
+                            <mat-option [value]="entregador.idEntregador">
+                                {{ entregador.nome }}
+                            </mat-option>
+                            }
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+
+            </div>
+        </section>
+
+        <section class="acoes">
+            <button class="acao primario" (click)="buscarRelatorioTodasEntregas()">
+                📄 Total de Entregas
+            </button>
+
+            <button class="acao secundario" (click)="buscarRelatorioMediaEntregas()">
+                ⏱️ Tempo Médio
+            </button>
+
+            <button class="acao terciario" (click)="buscarRelatorioServicos()">
+                🛠️ Serviços
+            </button>
+        </section>
+    </div>
+</div>
+
+<!-- LOADING -->
+<div *ngIf="loading" class="loading-overlay">
+    <div class="spinner"></div>
+    <span>Gerando relatório...</span>
+</div>

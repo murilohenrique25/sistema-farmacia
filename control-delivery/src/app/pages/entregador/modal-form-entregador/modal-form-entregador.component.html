@@ -1,0 +1,88 @@
+<div class="container-fluid p-3">
+    <mat-icon (click)="closeModal()" class="float-end hover">close</mat-icon>
+
+    <h1 class="title" *ngIf="!editEntregador">Cadastrar entregador</h1>
+    <h1 class="title" *ngIf="editEntregador">Editar entregador</h1>
+    <h2 class="subtitle" *ngIf="!editEntregador">Preencha o formulário para salvar entregador</h2>
+    <h2 class="subtitle" *ngIf="editEntregador">Preencha o formulário para editar entregador</h2>
+
+    <form class="row" [formGroup]="formEntregador">
+        <div class="col-12 col-md-6 mb-2">
+            <mat-form-field class="example-full-width w-100">
+                <mat-label>Nome</mat-label>
+                <input type="text" matInput formControlName="nome" placeholder="Digite o nome">
+                @if (formEntregador.controls['nome'].invalid) {
+                <mat-error>Por favor digite um nome válido</mat-error>
+                }
+            </mat-form-field>
+        </div>
+        <div class="col-12 col-md-6 mb-2">
+            <mat-form-field class="example-full-width w-100">
+                <mat-label>Usuário</mat-label>
+                <input type="text" [readonly]="true" matInput formControlName="usuario"
+                    placeholder="Usuário gerado automaticamente">
+                @if (formEntregador.controls['usuario'].invalid) {
+                <mat-error>Por favor digite um usuário válido</mat-error>
+                }
+            </mat-form-field>
+        </div>
+        <div class="col-12 col-md-6 mb-2">
+            <mat-form-field class="w-100">
+                <mat-label>Turno</mat-label>
+                <mat-select formControlName="turno">
+                    @for (turno of listaTurnos; track turno) {
+                    <mat-option [value]="turno.descricao">{{turno.descricao}}</mat-option>
+                    }
+                </mat-select>
+            </mat-form-field>
+        </div>
+        <div class="col-12 col-md-6 mb-2">
+            <mat-form-field class="w-100">
+                <mat-label>Matriz</mat-label>
+                <mat-select formControlName="idMatriz">
+                    @for (matriz of listaMatriz; track matriz) {
+                    <mat-option [value]="matriz.idMatriz">{{matriz.nome}}</mat-option>
+                    }
+                </mat-select>
+            </mat-form-field>
+        </div>
+        <div class="col-12 col-md-6 mb-2">
+            <mat-form-field class="example-full-width w-100">
+                <mat-label>Telefone</mat-label>
+                <input type="text" matInput formControlName="telefone" placeholder="Digite o telefone">
+                @if (formEntregador.controls['telefone'].invalid) {
+                <mat-error>Por favor digite um telefone válido</mat-error>
+                }
+            </mat-form-field>
+        </div>
+        <div class="col-12 col-md-6 mb-2">
+            <mat-form-field class="example-full-width w-100">
+                <mat-label>CPF</mat-label>
+                <input type="text" matInput formControlName="cpf" placeholder="Digite o CPF">
+                @if (formEntregador.controls['cpf'].invalid) {
+                <mat-error>Por favor digite um CPF válido</mat-error>
+                }
+            </mat-form-field>
+        </div>
+        <div class="col-12 col-md-6 mb-2">
+            <mat-form-field class="example-full-width w-100">
+                <mat-label>Senha</mat-label>
+                <input type="password" matInput formControlName="senha" placeholder="Digite a senha">
+                @if (formEntregador.controls['senha'].invalid) {
+                <mat-error>Por favor digite uma senha válida</mat-error>
+                }
+            </mat-form-field>
+        </div>
+        <div class="col-12 col-md-6 mb-2">
+            <mat-checkbox class="example-margin" formControlName="ativo"
+                [checked]="formEntregador.controls['ativo'].value" (change)="atualizarLabel()">
+                {{ labelAtivo }}
+            </mat-checkbox>
+        </div>
+        <div class="col-12 col-md-12 mb-2 ">
+            <button type="button" class="botao-primario float-end" [disabled]="!formEntregador.valid"
+                (click)="saveEntregador()">
+                {{editEntregador ? ' Editar entregador' : 'Salvar entregador'}}
+            </button>
+        </div>
+    </form>

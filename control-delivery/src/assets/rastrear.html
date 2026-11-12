@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rastrear Entrega · EntregaJá</title>
+
+  <!-- Leaflet.js — mapa open source, sem chave de API -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <style>
+    /* ── Reset & Base ─────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --brand-from: #6a11cb;
+      --brand-to:   #2575fc;
+      --brand-mid:  #4a45c8;
+      --surface:    #ffffff;
+      --bg:         #f4f6fb;
+      --text:       #1f2937;
+      --muted:      #6b7280;
+      --border:     #e5e7eb;
+      --success:    #10b981;
+      --warning:    #f59e0b;
+      --error:      #ef4444;
+      --radius-lg:  16px;
+      --radius-md:  10px;
+      --shadow-sm:  0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.05);
+      --shadow-md:  0 4px 16px rgba(0,0,0,.10);
+      --shadow-lg:  0 10px 40px rgba(0,0,0,.14);
+    }
+
+    html, body {
+      height: 100%;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Layout ───────────────────────────────────────────── */
+    .page {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Header ───────────────────────────────────────────── */
+    header {
+      background: linear-gradient(135deg, var(--brand-from), var(--brand-to));
+      padding: 20px 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: var(--shadow-md);
+    }
+    .logo-icon {
+      width: 40px; height: 40px;
+      background: rgba(255,255,255,.20);
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+    }
+    .logo-text { color: #fff; }
+    .logo-text h1 { font-size: 18px; font-weight: 700; line-height: 1.2; }
+    .logo-text p  { font-size: 12px; opacity: .75; }
+
+    /* ── Main ─────────────────────────────────────────────── */
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 32px 16px 40px;
+      gap: 24px;
+    }
+
+    /* ── Search card ──────────────────────────────────────── */
+    .search-card {
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md);
+      padding: 28px 24px;
+      width: 100%;
+      max-width: 480px;
+    }
+    .search-card h2 {
+      font-size: 18px; font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .search-card p {
+      font-size: 13px; color: var(--muted);
+      margin-bottom: 20px;
+    }
+
+    .input-group {
+      display: flex; gap: 8px;
+    }
+    .input-group input {
+      flex: 1;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 12px 16px;
+      font-size: 15px;
+      color: var(--text);
+      outline: none;
+      transition: border-color .2s;
+    }
+    .input-group input:focus { border-color: var(--brand-mid); }
+    .input-group input::placeholder { color: #b0b7c3; }
+
+    .btn-search {
+      background: linear-gradient(135deg, var(--brand-from), var(--brand-to));
+      color: #fff;
+      border: none;
+      border-radius: var(--radius-md);
+      padding: 12px 20px;
+      font-size: 14px; font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: opacity .2s, transform .1s;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .btn-search:hover  { opacity: .92; }
+    .btn-search:active { transform: scale(.97); }
+    .btn-search:disabled { opacity: .55; cursor: not-allowed; transform: none; }
+
+    /* ── Feedback states ──────────────────────────────────── */
+    .feedback {
+      width: 100%; max-width: 480px;
+      border-radius: var(--radius-md);
+      padding: 14px 18px;
+      font-size: 14px; font-weight: 500;
+      display: none; align-items: center; gap: 10px;
+    }
+    .feedback.show { display: flex; }
+    .feedback.error   { background:#fef2f2; border:1.5px solid #fca5a5; color:#b91c1c; }
+    .feedback.warning { background:#fffbeb; border:1.5px solid #fcd34d; color:#92400e; }
+    .feedback.info    { background:#eff6ff; border:1.5px solid #93c5fd; color:#1d4ed8; }
+    .feedback-icon { font-size: 18px; flex-shrink: 0; }
+
+    /* ── Entrega info card ────────────────────────────────── */
+    .entrega-card {
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md);
+      width: 100%; max-width: 480px;
+      overflow: hidden;
+      display: none;
+    }
+    .entrega-card.show { display: block; }
+
+    .entrega-header {
+      background: linear-gradient(135deg, var(--brand-from), var(--brand-to));
+      padding: 20px;
+      display: flex; align-items: center; gap: 14px;
+    }
+    .entrega-icon {
+      width: 48px; height: 48px;
+      background: rgba(255,255,255,.20);
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px;
+    }
+    .entrega-info h3 { color: #fff; font-size: 16px; font-weight: 700; }
+    .entrega-info p  { color: rgba(255,255,255,.75); font-size: 13px; margin-top: 2px; }
+
+    .status-badge {
+      margin-left: auto;
+      padding: 5px 12px;
+      border-radius: 999px;
+      font-size: 12px; font-weight: 600;
+      background: rgba(255,255,255,.20);
+      color: #fff;
+      white-space: nowrap;
+      display: flex; align-items: center; gap: 5px;
+    }
+    .pulse-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: #4ade80;
+      animation: pulse 1.4s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%,100% { transform: scale(1); opacity: 1; }
+      50%      { transform: scale(1.5); opacity: .6; }
+    }
+
+    .entrega-body { padding: 16px 20px; }
+    .entrega-row {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 13px;
+    }
+    .entrega-row:last-child { border-bottom: none; }
+    .entrega-row .label { color: var(--muted); min-width: 120px; }
+    .entrega-row .value { font-weight: 600; }
+    .entrega-row .icon  { font-size: 16px; color: var(--brand-mid); }
+
+    /* ── Map ──────────────────────────────────────────────── */
+    .map-wrapper {
+      width: 100%; max-width: 700px;
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow-lg);
+      display: none;
+    }
+    .map-wrapper.show { display: block; }
+    .map-toolbar {
+      background: var(--surface);
+      padding: 12px 16px;
+      display: flex; align-items: center; justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+      font-size: 13px;
+    }
+    .map-toolbar .left { display: flex; align-items: center; gap: 8px; font-weight: 600; }
+    .map-toolbar .left span { font-size: 16px; }
+    .refresh-info { color: var(--muted); font-size: 12px; }
+    #map {
+      width: 100%;
+      height: 360px;
+    }
+
+    /* ── Loading spinner ──────────────────────────────────── */
+    .spinner {
+      width: 20px; height: 20px;
+      border: 2.5px solid rgba(255,255,255,.35);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+      display: inline-block;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Footer ───────────────────────────────────────────── */
+    footer {
+      text-align: center;
+      padding: 20px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    /* ── Responsive ───────────────────────────────────────── */
+    @media (max-width: 480px) {
+      .input-group { flex-direction: column; }
+      .btn-search  { justify-content: center; }
+      #map         { height: 280px; }
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <!-- Header -->
+  <header>
+    <div class="logo-icon">🛵</div>
+    <div class="logo-text">
+      <h1>EntregaJá</h1>
+      <p>Rastreamento de entrega em tempo real</p>
+    </div>
+  </header>
+
+  <!-- Main -->
+  <main>
+
+    <!-- Busca -->
+    <div class="search-card">
+      <h2>Rastrear minha entrega</h2>
+      <p>Digite o código numérico da sua entrega para ver a posição do entregador.</p>
+      <div class="input-group">
+        <input
+          type="number"
+          id="input-codigo"
+          placeholder="Ex: 1042"
+          min="1"
+          autofocus
+        />
+        <button class="btn-search" id="btn-rastrear" onclick="rastrear()">
+          <span id="btn-text">Rastrear</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Feedback -->
+    <div class="feedback" id="feedback">
+      <span class="feedback-icon" id="feedback-icon">ℹ️</span>
+      <span id="feedback-msg"></span>
+    </div>
+
+    <!-- Card da entrega -->
+    <div class="entrega-card" id="entrega-card">
+      <div class="entrega-header">
+        <div class="entrega-icon">📦</div>
+        <div class="entrega-info">
+          <h3 id="card-titulo">Entrega #–</h3>
+          <p id="card-subtitulo">Aguardando dados…</p>
+        </div>
+        <div class="status-badge">
+          <div class="pulse-dot"></div>
+          Em rota
+        </div>
+      </div>
+      <div class="entrega-body">
+        <div class="entrega-row">
+          <span class="icon">📍</span>
+          <span class="label">Última atualização</span>
+          <span class="value" id="card-atualizado">–</span>
+        </div>
+        <div class="entrega-row">
+          <span class="icon">🌐</span>
+          <span class="label">Coordenadas</span>
+          <span class="value" id="card-coords">–</span>
+        </div>
+        <div class="entrega-row">
+          <span class="icon">🔄</span>
+          <span class="label">Atualização automática</span>
+          <span class="value">a cada 10 segundos</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mapa -->
+    <div class="map-wrapper" id="map-wrapper">
+      <div class="map-toolbar">
+        <div class="left"><span>🗺️</span> Posição do entregador</div>
+        <span class="refresh-info" id="refresh-label">Buscando…</span>
+      </div>
+      <div id="map"></div>
+    </div>
+
+  </main>
+
+  <footer>© EntregaJá · Rastreamento seguro e em tempo real</footer>
+</div>
+
+<script>
+  // ── Configuração ────────────────────────────────────────
+  const API_BASE = 'https://tomcat.vps6912.panel.icontainer.net:8443/control-api';
+  const POLL_INTERVAL = 10_000; // ms
+
+  // ── Estado ──────────────────────────────────────────────
+  let map = null;
+  let marker = null;
+  let intervalId = null;
+  let idEntregaAtual = null;
+  let ultimaAtualizacao = null;
+
+  // ── Elementos ────────────────────────────────────────────
+  const inputCodigo  = document.getElementById('input-codigo');
+  const btnRastrear  = document.getElementById('btn-rastrear');
+  const btnText      = document.getElementById('btn-text');
+  const feedbackEl   = document.getElementById('feedback');
+  const feedbackIcon = document.getElementById('feedback-icon');
+  const feedbackMsg  = document.getElementById('feedback-msg');
+  const entregaCard  = document.getElementById('entrega-card');
+  const mapWrapper   = document.getElementById('map-wrapper');
+  const refreshLabel = document.getElementById('refresh-label');
+
+  // Permitir Enter no campo
+  inputCodigo.addEventListener('keydown', e => { if (e.key === 'Enter') rastrear(); });
+
+  // ── Funções de UI ────────────────────────────────────────
+  function showFeedback(type, icon, msg) {
+    feedbackEl.className = `feedback show ${type}`;
+    feedbackIcon.textContent = icon;
+    feedbackMsg.textContent  = msg;
+  }
+  function hideFeedback() {
+    feedbackEl.className = 'feedback';
+  }
+  function setLoading(on) {
+    btnRastrear.disabled = on;
+    btnText.innerHTML = on
+      ? '<span class="spinner"></span>'
+      : 'Rastrear';
+  }
+
+  // ── Inicializar mapa ─────────────────────────────────────
+  function initMap(lat, lng) {
+    if (map) return; // já existe
+
+    map = L.map('map', { zoomControl: true, attributionControl: true });
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '© <a href="https://openstreetmap.org">OpenStreetMap</a>'
+    }).addTo(map);
+
+    // Ícone personalizado
+    const icon = L.divIcon({
+      className: '',
+      html: `<div style="
+        background: linear-gradient(135deg,#6a11cb,#2575fc);
+        border: 3px solid #fff;
+        border-radius: 50% 50% 50% 0;
+        transform: rotate(-45deg);
+        width: 36px; height: 36px;
+        display:flex; align-items:center; justify-content:center;
+        box-shadow: 0 3px 12px rgba(0,0,0,.30);
+      ">
+        <span style="transform:rotate(45deg); font-size:16px;">🛵</span>
+      </div>`,
+      iconSize: [36, 36],
+      iconAnchor: [18, 36],
+      popupAnchor: [0, -40],
+    });
+
+    marker = L.marker([lat, lng], { icon })
+      .addTo(map)
+      .bindPopup('<strong>Entregador</strong><br>Posição atual')
+      .openPopup();
+
+    map.setView([lat, lng], 15);
+  }
+
+  // ── Atualizar posição no mapa ────────────────────────────
+  function updateMap(lat, lng) {
+    if (!map) {
+      initMap(lat, lng);
+      return;
+    }
+    marker.setLatLng([lat, lng]);
+    map.panTo([lat, lng], { animate: true, duration: 0.8 });
+  }
+
+  // ── Formatar data ────────────────────────────────────────
+  function formatarData(isoString) {
+    if (!isoString) return '–';
+    const d = new Date(isoString);
+    return d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  }
+
+  // ── Buscar localização na API ────────────────────────────
+  async function buscarLocalizacao(idEntrega) {
+    const url = `${API_BASE}/api/v1/entrega-localizacao/${idEntrega}/localizacao-atual`;
+
+    const res = await fetch(url);
+
+    if (res.status === 204) {
+      // Não está em rota
+      return null;
+    }
+    if (!res.ok) {
+      throw new Error(`Erro ${res.status}`);
+    }
+    return res.json();
+  }
+
+  // ── Polling ──────────────────────────────────────────────
+  async function tick() {
+    try {
+      const data = await buscarLocalizacao(idEntregaAtual);
+
+      if (!data) {
+        // Entrega saiu de rota (finalizada ou cancelada)
+        pararPolling();
+        showFeedback('warning', '✅', 'A entrega foi finalizada ou não está mais em rota.');
+        entregaCard.classList.remove('show');
+        mapWrapper.classList.remove('show');
+        return;
+      }
+
+      const { latitude, longitude, atualizadoEm } = data;
+      ultimaAtualizacao = new Date();
+
+      // Atualizar card
+      document.getElementById('card-titulo').textContent    = `Entrega #${idEntregaAtual}`;
+      document.getElementById('card-subtitulo').textContent = 'Entregador a caminho 🚴';
+      document.getElementById('card-atualizado').textContent = formatarData(atualizadoEm);
+      document.getElementById('card-coords').textContent    =
+        `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`;
+      refreshLabel.textContent = `Atualizado às ${formatarData(atualizadoEm)}`;
+
+      // Mostrar card e mapa
+      entregaCard.classList.add('show');
+      mapWrapper.classList.add('show');
+      hideFeedback();
+
+      updateMap(latitude, longitude);
+
+      // Forçar redimensionamento do mapa (necessário quando fica oculto inicialmente)
+      setTimeout(() => map && map.invalidateSize(), 100);
+
+    } catch (err) {
+      refreshLabel.textContent = 'Erro ao atualizar';
+      console.error(err);
+    }
+  }
+
+  function pararPolling() {
+    if (intervalId) { clearInterval(intervalId); intervalId = null; }
+  }
+
+  // ── Ação principal ───────────────────────────────────────
+  async function rastrear() {
+    const codigo = inputCodigo.value.trim();
+
+    if (!codigo || isNaN(Number(codigo)) || Number(codigo) <= 0) {
+      showFeedback('error', '⚠️', 'Digite um código de entrega válido.');
+      return;
+    }
+
+    pararPolling();
+    setLoading(true);
+    hideFeedback();
+    entregaCard.classList.remove('show');
+    mapWrapper.classList.remove('show');
+    idEntregaAtual = Number(codigo);
+
+    try {
+      const data = await buscarLocalizacao(idEntregaAtual);
+
+      if (!data) {
+        showFeedback('warning', '📦', 'Entrega não encontrada ou não está em rota no momento.');
+        setLoading(false);
+        return;
+      }
+
+      setLoading(false);
+      await tick(); // Primeira atualização imediata
+
+      // Iniciar polling
+      intervalId = setInterval(tick, POLL_INTERVAL);
+
+    } catch (err) {
+      setLoading(false);
+      showFeedback('error', '❌', 'Não foi possível buscar a entrega. Verifique o código e tente novamente.');
+      console.error(err);
+    }
+  }
+</script>
+</body>
+</html>

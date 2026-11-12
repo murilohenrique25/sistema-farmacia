@@ -1,0 +1,82 @@
+<app-menu />
+<div class="container-fluid pt-3">
+    <div class="page-header">
+        <div class="page-title">
+            <div class="icon">🏢</div>
+            <div>
+                <h1>Cadastro de Filiais</h1>
+                <h2 class="subtitle">Gerencie as filiais da matriz, adicionando ou editando</h2>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div *ngIf="!existeDado" class="loading-overlay">
+            <div class="spinner"></div>
+            <p>Carregando...</p>
+        </div>
+
+        <div class="col-12">
+            <app-button class="float-end" (click)="addModalFilial()" textButton="+ cadastrar"></app-button>
+            <div class="table-toolbar">
+                <mat-icon>search</mat-icon>
+                <input type="text" placeholder="Buscar por nome, cnpj..." (keyup)="aplicarFiltro($event)" #input />
+            </div>
+
+            <table class="mat-elevation-z8" mat-table [dataSource]="dataSource" matSort>
+
+                <ng-container matColumnDef="idFilial">
+                    <th class="th-table" mat-header-cell *matHeaderCellDef mat-sort-header> ID </th>
+                    <td class="td-table" mat-cell *matCellDef="let filial"> {{filial.idFilial}} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="nome">
+                    <th class="th-table" mat-header-cell *matHeaderCellDef mat-sort-header> Nome </th>
+                    <td class="td-table" mat-cell *matCellDef="let filial"> {{filial.nome}} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="cnpj">
+                    <th class="th-table" mat-header-cell *matHeaderCellDef mat-sort-header> CNPJ </th>
+                    <td class="td-table" mat-cell *matCellDef="let filial"> {{filial.cnpj}} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="telefone">
+                    <th class="th-table" mat-header-cell *matHeaderCellDef mat-sort-header> Telefone </th>
+                    <td class="td-table" mat-cell *matCellDef="let filial"> {{filial.telefone}} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="freteFixo">
+                    <th class="th-table" mat-header-cell *matHeaderCellDef mat-sort-header> Frete Fixo </th>
+                    <td class="td-table" mat-cell *matCellDef="let filial">
+                        <mat-icon class="c-primary" *ngIf="filial.freteFixo">check</mat-icon>
+                        <mat-icon class="c-error" *ngIf="!filial.freteFixo">remove</mat-icon>
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="valorFrete">
+                    <th class="th-table" mat-header-cell *matHeaderCellDef mat-sort-header> Valor Frete </th>
+                    <td class="td-table" mat-cell *matCellDef="let filial">
+                        {{ filial.freteFixo ? (filial.valorFrete | currency:'BRL':'symbol':'1.2-2') : '-' }}
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="action">
+                    <th class="th-table" style="width: 12%;" mat-header-cell *matHeaderCellDef> </th>
+                    <td class="td-table" mat-cell *matCellDef="let filial">
+                        <mat-icon class="icone-tabela" (click)="openModalEditFilial(filial)">edit</mat-icon>
+                    </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+                <tr class="mat-row" *matNoDataRow>
+                    <td class="mat-cell no-data" colspan="7">Nenhuma filial encontrada para a pesquisa "{{input.value}}"
+                    </td>
+                </tr>
+            </table>
+
+            <mat-paginator class="shadow-sm" [pageSizeOptions]="[10, 15, 25]"
+                aria-label="Selecione quantidade de filiais por página"></mat-paginator>
+        </div>
+    </div>
+</div>

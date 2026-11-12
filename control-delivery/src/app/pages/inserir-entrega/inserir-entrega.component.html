@@ -1,0 +1,99 @@
+<app-menu />
+<div class="container-fluid pt-3">
+
+    <div class="page-header">
+        <div class="page-title">
+            <div class="icon">➕</div>
+            <div>
+                <h1>Inserir Entrega</h1>
+                <h2>Insira de forma rápida uma nova entrega!</h2>
+            </div>
+        </div>
+    </div>
+
+    <form class="row" [formGroup]="formEntrega">
+        <div class="col-12 col-md-3 mb-2">
+            <mat-form-field class="example-full-width w-100">
+                <mat-label>Documento</mat-label>
+                <input type="text" matInput formControlName="cupomOrcamento" placeholder="Digite o Cupom/Orcamento"
+                    (keydown.enter)="$event.preventDefault(); inputTipoEntrega.focus()" #inputDocumento>
+                @if (formEntrega.controls['cupomOrcamento'].invalid) {
+                <mat-error>Por favor digite o documento</mat-error>
+                }
+            </mat-form-field>
+        </div>
+
+        <div class="col-12 col-md-3 mb-2">
+            <mat-form-field class="w-100">
+                <mat-label>Tipo de Entrega</mat-label>
+                <mat-select formControlName="tipoEntrega" #inputTipoEntrega>
+                    @for (tipoEntrega of listTipoEntrega; track tipoEntrega) {
+                    <mat-option [value]="tipoEntrega">{{tipoEntrega}}</mat-option>
+                    }
+                </mat-select>
+            </mat-form-field>
+        </div>
+
+        <div class="col-12 col-md-3 mb-2">
+            <mat-form-field class="w-100">
+                <mat-label>Forma de Pagamento</mat-label>
+                <mat-select formControlName="formaPagamento">
+                    @for (formaPagamento of listFormaPagamento; track formaPagamento) {
+                    <mat-option [value]="formaPagamento.descricao">{{formaPagamento.descricao}}</mat-option>
+                    }
+                </mat-select>
+            </mat-form-field>
+        </div>
+
+        <div class="col-12 col-md-3 mb-2">
+            <mat-form-field class="example-full-width w-100">
+                <mat-label>Valor Total</mat-label>
+                <input type="number" matInput formControlName="valorTotal" placeholder="Digite o valor total da venda"
+                    (input)="calcularTroco()" #inputValorTotal>
+                <mat-error *ngIf="formEntrega.controls['valorTotal'].invalid">
+                    Por favor, digite um valor válido
+                </mat-error>
+            </mat-form-field>
+        </div>
+
+        <div class="col-12 col-md-3 mb-2">
+            <mat-form-field class="example-full-width w-100">
+                <mat-label>Valor Recebido/ À Receber</mat-label>
+                <input type="number" matInput formControlName="valorReceber" placeholder="Digite o valor recebido"
+                    (input)="calcularTroco()" #inputValorRecebido>
+                <mat-error *ngIf="formEntrega.controls['valorReceber'].invalid">
+                    Por favor digite um valor válido
+                </mat-error>
+            </mat-form-field>
+        </div>
+
+        <div class="col-12 col-md-3 mb-2">
+            <mat-form-field class="example-full-width w-100">
+                <mat-label>Troco</mat-label>
+                <input type="number" [readonly]="true" matInput formControlName="troco" placeholder="Troco"
+                    [value]="troco">
+            </mat-form-field>
+        </div>
+        <div class="col-12 col-md-3 mb-2">
+            <mat-form-field class="example-full-width w-100">
+                <mat-label>Whatsapp</mat-label>
+                <input type="text" matInput formControlName="telefone" (input)="onInputWhatsapp($event)"
+                    [value]="telefoneFormatado" placeholder="Digite o whatsapp" #inputWhatsapp>
+            </mat-form-field>
+        </div>
+        <div class="col-12 col-md-3 mb-2">
+            <mat-form-field class="example-full-width w-100">
+                <mat-label>Observação</mat-label>
+                <input type="text" matInput formControlName="observacao"
+                    placeholder="Digite uma observação para entregador" #inputObservacao>
+            </mat-form-field>
+        </div>
+
+        <div class="col-12 col-md-12 mb-2 ">
+            <button type="button" class="btn primary float-end" [disabled]="!formEntrega.valid || isSaving"
+                (click)="saveEntrega()">
+                {{ isSaving ? 'Salvando...' : 'Salvar entrega' }}
+            </button>
+        </div>
+    </form>
+</div>

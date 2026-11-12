@@ -1,0 +1,35 @@
+<div class="container-fluid p-3">
+    <mat-icon (click)="closeModal()" class="float-end hover">close</mat-icon>
+
+    <h1 class="title">Detalhes do serviço</h1>
+    <h2 class="subtitle">Tenha uma visão mais detalhada do serviço realizado</h2>
+
+    <div class="row mt-3">
+        <div class="col-6">
+            <h4 class="title-information">Código</h4>
+            <p class="information">{{servicoData.id}}</p>
+        </div>
+        <div class="col-6">
+            <h4 class="title-information">Entregador</h4>
+            <p class="information">{{servicoData.userId}}</p>
+        </div>
+        <div class="col-6">
+            <h4 class="title-information">Data Inicial</h4>
+            <p class="information"> {{ servicoData.dataHoraInicioServico | dateTimeFormat }}</p>
+        </div>
+        <div class="col-6">
+            <h4 class="title-information">Data Final</h4>
+            <p class="information">{{ servicoData.dataHoraTerminoServico | dateTimeFormat }}</p>
+        </div>
+        <div class="col-6">
+            <h4 class="title-information">Descrição</h4>
+            <p class="information" *ngIf="servicoData.descricaoServico">{{servicoData.descricaoServico}}</p>
+            <p class="information" *ngIf="!servicoData.descricaoServico"> - </p>
+        </div>
+        <div class="col-6">
+            <h4 class="title-information">Observação</h4>
+            <p class="information" *ngIf="servicoData.observacaoServico">{{servicoData.observacaoServico}}</p>
+            <p class="information" *ngIf="!servicoData.observacaoServico"> - </p>
+        </div>
+    </div>
+</div>

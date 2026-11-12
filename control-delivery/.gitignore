@@ -1,0 +1,120 @@
+# See http://help.github.com/ignore-files/ for more about ignoring files.
+
+# Compiled output
+/dist
+/tmp
+/out-tsc
+/bazel-out
+
+# Node
+/node_modules
+npm-debug.log
+yarn-error.log
+
+# IDEs and editors
+.idea/
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
+# Visual Studio Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.history/*
+
+# Miscellaneous
+/.angular/cache
+.sass-cache/
+/connect.lock
+/coverage
+/libpeerconnection.log
+testem.log
+/typings
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Environments
+src/environments/environment.ts
+src/environments/environment.*.ts
+
+# Repository hygiene (local artifacts and private configuration)
+
+# Local configuration and secrets (keep sanitized examples)
+.env
+.env.*
+!.env.example
+!.env.sample
+!.env.template
+!.env.*.example
+!.env.*.sample
+!.env.*.template
+.envrc
+*.pem
+*.key
+*.ppk
+*.p12
+*.pfx
+*.jks
+*.keystore
+id_rsa
+id_ed25519
+credentials.json
+credentials.local.*
+service-account*.json
+service_account*.json
+*-firebase-adminsdk-*.json
+.npmrc.local
+# Local databases and runtime data
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+*.sqlite-journal
+*.sqlite3-journal
+dump.sql
+dump-*.sql
+dump_*.sql
+backup.sql
+backup-*.sql
+backup_*.sql
+backups/
+# Logs, reports and machine-specific files
+*.log
+logs/
+coverage/
+desktop.ini
+*.swp
+*.swo
+*.tmp
+*.bak
+
+# node dependencies and generated files
+node_modules/
+dist/
+build/
+out-tsc/
+.angular/
+.next/
+.nuxt/
+.output/
+.svelte-kit/
+.turbo/
+.parcel-cache/
+.vite/
+.npm/
+.pnpm-store/
+.yarn/cache/
+.yarn/unplugged/
+.yarn/install-state.gz
+*.tsbuildinfo
+.eslintcache
+.stylelintcache

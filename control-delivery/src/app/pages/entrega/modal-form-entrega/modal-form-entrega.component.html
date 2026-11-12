@@ -1,0 +1,128 @@
+<div class="container-fluid p-3">
+    <mat-icon (click)="closeModal()" class="float-end hover">close</mat-icon>
+
+    <h1 class="title">Cadastrar entrega</h1>
+    <h2 class="subtitle">Preencha o formulário para nova entrega</h2>
+
+    <form class="row" [formGroup]="formEntrega">
+        <div class="col-12 col-md-6 mb-2">
+            <mat-form-field class="example-full-width w-100">
+                <mat-label>Documento</mat-label>
+                <input type="text" matInput formControlName="cupomOrcamento" placeholder="Digite o Cupom/Orcamento"
+                    (keydown.enter)="$event.preventDefault(); inputUsuario.focus()" #inputDocumento>
+                @if (formEntrega.controls['cupomOrcamento'].invalid) {
+                <mat-error>Por favor digite o documento</mat-error>
+                }
+            </mat-form-field>
+        </div>
+
+        <div class="col-12 col-md-6 mb-2">
+            <mat-form-field class="example-full-width w-100">
+                <mat-label>Usuário</mat-label>
+                <input type="text" [readonly]="true" matInput formControlName="usuario" placeholder="Usuário cadastro"
+                    #inputUsuario (keydown.enter)="$event.preventDefault(); inputData.focus()">
+            </mat-form-field>
+        </div>
+
+        <div class="col-12 col-md-6 mb-2">
+            <mat-form-field class="example-full-width w-100">
+                <mat-label>Data Inclusão</mat-label>
+                <input type="text" [readonly]="true" matInput formControlName="dataCadastroEntrega"
+                    placeholder="Usuário cadastro" #inputData
+                    (keydown.enter)="$event.preventDefault(); inputTipoEntrega.focus()">
+            </mat-form-field>
+        </div>
+
+        <div class="col-12 col-md-6 mb-2">
+            <mat-form-field class="w-100">
+                <mat-label>Tipo de Entrega</mat-label>
+                <mat-select formControlName="tipoEntrega" #inputTipoEntrega>
+                    @for (tipoEntrega of listTipoEntrega; track tipoEntrega) {
+                    <mat-option [value]="tipoEntrega">{{tipoEntrega}}</mat-option>
+                    }
+                </mat-select>
+            </mat-form-field>
+        </div>
+
+        <div class="col-12 col-md-6 mb-2">
+            <mat-form-field class="w-100">
+                <mat-label>Forma de Pagamento</mat-label>
+                <mat-select formControlName="formaPagamento">
+                    @for (formaPagamento of listFormaPagamento; track formaPagamento) {
+                    <mat-option [value]="formaPagamento.descricao">{{formaPagamento.descricao}}</mat-option>
+                    }
+                </mat-select>
+            </mat-form-field>
+        </div>
+
+        <div class="col-12 col-md-6 mb-2">
+            <mat-form-field class="w-100">
+                <mat-label>Matriz</mat-label>
+                <mat-select formControlName="idMatriz">
+                    @for (matriz of listaMatriz; track matriz) {
+                    <mat-option [value]="matriz.idMatriz">{{matriz.nome}}</mat-option>
+                    }
+                </mat-select>
+            </mat-form-field>
+        </div>
+
+        <div class="col-12 col-md-6 mb-2">
+            <mat-form-field class="example-full-width w-100">
+                <mat-label>Valor Total</mat-label>
+                <input type="number" matInput formControlName="valorTotal" placeholder="Digite o valor total da venda"
+                    (input)="calcularTroco()" #inputValorTotal>
+                <mat-error *ngIf="formEntrega.controls['valorTotal'].invalid">
+                    Por favor, digite um valor válido
+                </mat-error>
+            </mat-form-field>
+        </div>
+
+        <div class="col-12 col-md-6 mb-2">
+            <mat-form-field class="example-full-width w-100">
+                <mat-label>Valor Recebido/ À Receber</mat-label>
+                <input type="number" matInput formControlName="valorReceber" placeholder="Digite o valor recebido"
+                    (input)="calcularTroco()" #inputValorRecebido>
+                <mat-error *ngIf="formEntrega.controls['valorReceber'].invalid">
+                    Por favor digite um valor válido
+                </mat-error>
+            </mat-form-field>
+        </div>
+
+        <div class="col-12 col-md-6 mb-2">
+            <mat-form-field class="example-full-width w-100">
+                <mat-label>Troco</mat-label>
+                <input type="number" [readonly]="true" matInput formControlName="troco" placeholder="Troco"
+                    [value]="troco">
+            </mat-form-field>
+        </div>
+        <div class="col-12 col-md-6 mb-2">
+            <mat-form-field class="example-full-width w-100">
+                <mat-label>Whatsapp</mat-label>
+                <input type="text" matInput formControlName="telefone" (input)="onInputWhatsapp($event)"
+                    [value]="telefoneFormatado" placeholder="Digite o whatsapp" #inputWhatsapp>
+            </mat-form-field>
+        </div>
+        <div class="col-12 col-md-6 mb-2">
+            <mat-form-field class="example-full-width w-100">
+                <mat-label>Observação</mat-label>
+                <input type="text" matInput formControlName="observacao"
+                    placeholder="Digite uma observação para entregador" #inputObservacao>
+            </mat-form-field>
+        </div>
+
+        <div class="col-12 col-md-6 mb-2" *ngIf="!freteFixoSelecionado">
+            <mat-form-field class="example-full-width w-100">
+                <mat-label>Valor do Frete (opcional)</mat-label>
+                <input type="number" min="0" step="0.01" matInput formControlName="valorFrete"
+                    placeholder="Digite o valor do frete">
+            </mat-form-field>
+        </div>
+
+        <div class="col-12 col-md-12 mb-2 ">
+            <button type="button" class="botao-primario float-end" [disabled]="!formEntrega.valid || isSaving"
+                (click)="saveEntrega()">
+                {{ isSaving ? 'Salvando...' : (editarEntrega ? 'Editar entrega' : 'Salvar entrega') }}
+            </button>
+        </div>
+    </form>
+</div>

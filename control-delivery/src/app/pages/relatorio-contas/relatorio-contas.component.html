@@ -1,0 +1,148 @@
+<app-menu />
+<div class="container-fluid pt-3">
+
+    <div class="page-header">
+        <div class="page-title">
+            <div class="icon">📋</div>
+            <div>
+                <h1>Relatório de Contas</h1>
+                <h2 class="subtitle">Visualize e analise contas a pagar e a receber por período</h2>
+            </div>
+        </div>
+    </div>
+
+    <!-- FILTROS -->
+    <section class="filtros-card">
+        <div class="filtros-grid">
+            <mat-form-field appearance="outline">
+                <mat-label>Tipo</mat-label>
+                <mat-select [(ngModel)]="tipo" (ngModelChange)="contas = []; buscou = false">
+                    <mat-option value="PAGAR">Contas a Pagar</mat-option>
+                    <mat-option value="RECEBER">Contas a Receber</mat-option>
+                    <mat-option value="AMBOS">Unificado (Ambos)</mat-option>
+                </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+                <mat-label>Data início</mat-label>
+                <input matInput [matDatepicker]="pickerInicio" [(ngModel)]="inicio">
+                <mat-datepicker-toggle matSuffix [for]="pickerInicio"></mat-datepicker-toggle>
+                <mat-datepicker #pickerInicio></mat-datepicker>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+                <mat-label>Data fim</mat-label>
+                <input matInput [matDatepicker]="pickerFim" [(ngModel)]="fim">
+                <mat-datepicker-toggle matSuffix [for]="pickerFim"></mat-datepicker-toggle>
+                <mat-datepicker #pickerFim></mat-datepicker>
+            </mat-form-field>
+
+            <button class="botao-primario" (click)="buscar()">
+                <mat-icon>search</mat-icon> Buscar
+            </button>
+        </div>
+    </section>
+
+    <!-- TOTALIZADORES -->
+    <div class="row mb-3" *ngIf="buscou && contas.length > 0">
+        <!-- AMBOS: saldo, a receber, a pagar -->
+        <ng-container *ngIf="tipo === 'AMBOS'">
+            <div class="col-md-4 col-6 mb-2">
+                <div class="kpi-card" [class.success]="totalGeral >= 0" [class.danger]="totalGeral < 0">
+                    <p>Saldo (Entradas - Saídas)</p>
+                    <h2>{{ totalGeral | currency:'BRL' }}</h2>
+                </div>
+            </div>
+            <div class="col-md-4 col-6 mb-2">
+                <div class="kpi-card success">
+                    <p>A Receber / Recebido</p>
+                    <h2>{{ totalReceber | currency:'BRL' }}</h2>
+                </div>
+            </div>
+            <div class="col-md-4 col-6 mb-2">
+                <div class="kpi-card danger">
+                    <p>A Pagar / Pago</p>
+                    <h2>{{ totalPagar | currency:'BRL' }}</h2>
+                </div>
+            </div>
+        </ng-container>
+
+        <!-- TIPO ÚNICO -->
+        <ng-container *ngIf="tipo !== 'AMBOS'">
+            <div class="col-md-4 col-6 mb-2">
+                <div class="kpi-card">
+                    <p>Total Geral</p>
+                    <h2>{{ totalGeral | currency:'BRL' }}</h2>
+                </div>
+            </div>
+            <div class="col-md-4 col-6 mb-2">
+                <div class="kpi-card success">
+                    <p>{{ tipo === 'RECEBER' ? 'Recebido' : 'Pago' }}</p>
+                    <h2>{{ totalPago | currency:'BRL' }}</h2>
+                </div>
+            </div>
+            <div class="col-md-4 col-6 mb-2">
+                <div class="kpi-card danger">
+                    <p>Pendente / Vencido</p>
+                    <h2>{{ totalPendente | currency:'BRL' }}</h2>
+                </div>
+            </div>
+        </ng-container>
+    </div>
+
+    <!-- TABELA -->
+    <div *ngIf="carregando" class="text-center p-4">
+        <mat-progress-spinner mode="indeterminate" diameter="40" style="margin:auto"></mat-progress-spinner>
+    </div>
+
+    <table class="mat-elevation-z8 w-100" mat-table [dataSource]="contas"
+        *ngIf="buscou && !carregando && contas.length > 0">
+        <ng-container matColumnDef="tipo">
+            <th class="th-table" mat-header-cell *matHeaderCellDef>Tipo</th>
+            <td class="td-table" mat-cell *matCellDef="let c">
+                <span class="tipo-badge" [class.entrada]="c.tipo === 'RECEBER'" [class.saida]="c.tipo === 'PAGAR'">
+                    {{ tipoLabel(c.tipo) }}
+                </span>
+            </td>
+        </ng-container>
+        <ng-container matColumnDef="descricao">
+            <th class="th-table" mat-header-cell *matHeaderCellDef>Descrição</th>
+            <td class="td-table" mat-cell *matCellDef="let c">{{ c.descricao }}</td>
+        </ng-container>
+        <ng-container matColumnDef="categoria">
+            <th class="th-table" mat-header-cell *matHeaderCellDef>Categoria</th>
+            <td class="td-table" mat-cell *matCellDef="let c">{{ c.categoria || '—' }}</td>
+        </ng-container>
+        <ng-container matColumnDef="valor">
+            <th class="th-table" mat-header-cell *matHeaderCellDef>Valor</th>
+            <td class="td-table" mat-cell *matCellDef="let c">{{ c.valor | currency:'BRL' }}</td>
+        </ng-container>
+        <ng-container matColumnDef="dataVencimento">
+            <th class="th-table" mat-header-cell *matHeaderCellDef>Vencimento</th>
+            <td class="td-table" mat-cell *matCellDef="let c">{{ c.dataVencimento | date:'dd/MM/yyyy' }}</td>
+        </ng-container>
+        <ng-container matColumnDef="dataPagamento">
+            <th class="th-table" mat-header-cell *matHeaderCellDef>Pagamento</th>
+            <td class="td-table" mat-cell *matCellDef="let c">{{ c.dataPagamento ? (c.dataPagamento | date:'dd/MM/yyyy')
+                : '—' }}</td>
+        </ng-container>
+        <ng-container matColumnDef="status">
+            <th class="th-table" mat-header-cell *matHeaderCellDef>Status</th>
+            <td class="td-table" mat-cell *matCellDef="let c">
+                <span class="status-badge" [ngClass]="statusClass(c.status)">{{ c.status }}</span>
+            </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="tipo === 'AMBOS'
+            ? ['tipo','descricao','categoria','valor','dataVencimento','dataPagamento','status']
+            : ['descricao','categoria','valor','dataVencimento','dataPagamento','status']"></tr>
+        <tr mat-row *matRowDef="let row; columns: tipo === 'AMBOS'
+            ? ['tipo','descricao','categoria','valor','dataVencimento','dataPagamento','status']
+            : ['descricao','categoria','valor','dataVencimento','dataPagamento','status'];">
+        </tr>
+    </table>
+
+    <div *ngIf="buscou && !carregando && contas.length === 0" class="empty-state">
+        Nenhuma conta encontrada para o período selecionado.
+    </div>
+</div>

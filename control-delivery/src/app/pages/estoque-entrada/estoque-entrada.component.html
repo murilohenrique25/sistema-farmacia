@@ -1,0 +1,199 @@
+<app-menu />
+<div class="container-fluid pt-3">
+
+    <div class="page-header">
+        <div class="page-title">
+            <div class="icon">📥</div>
+            <div>
+                <h1>Entrada de Estoque</h1>
+                <h2 class="subtitle">Registre entradas manualmente ou importe via NF-e XML</h2>
+            </div>
+        </div>
+    </div>
+
+    <div *ngIf="carregando" class="loading-overlay">
+        <div class="spinner"></div>
+        <p>Carregando...</p>
+    </div>
+
+    <mat-tab-group>
+
+        <!-- Aba 1: Entrada Manual -->
+        <mat-tab label="Entrada Manual">
+            <div class="tab-content">
+
+                <div *ngFor="let item of itens; let i = index" class="item-linha">
+
+                    <mat-form-field appearance="outline" class="field-produto">
+                        <mat-label>Produto</mat-label>
+                        <mat-select [(ngModel)]="item.idProduto">
+                            <mat-option *ngFor="let p of produtos" [value]="p.idProduto">{{ p.nome }}</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+
+                    <mat-form-field appearance="outline" class="field-lote">
+                        <mat-label>Número do Lote</mat-label>
+                        <input matInput [(ngModel)]="item.numeroLote" placeholder="Ex: LOT-001" />
+                    </mat-form-field>
+
+                    <mat-form-field appearance="outline" class="field-num">
+                        <mat-label>Quantidade</mat-label>
+                        <input matInput type="number" min="0" [(ngModel)]="item.quantidade" />
+                    </mat-form-field>
+
+                    <mat-form-field appearance="outline" class="field-num">
+                        <mat-label>Preço de Custo</mat-label>
+                        <input matInput type="number" min="0" step="0.01" [(ngModel)]="item.precoCusto" />
+                    </mat-form-field>
+
+                    <mat-form-field appearance="outline" class="field-date">
+                        <mat-label>Data de Entrada</mat-label>
+                        <input matInput type="date" [(ngModel)]="item.dataEntrada" />
+                    </mat-form-field>
+
+                    <mat-form-field appearance="outline" class="field-date">
+                        <mat-label>Data de Validade</mat-label>
+                        <input matInput type="date" [(ngModel)]="item.dataValidade" />
+                    </mat-form-field>
+
+                    <button class="botao-remover" (click)="removerItem(i)" title="Remover item">
+                        <mat-icon>delete</mat-icon>
+                    </button>
+
+                </div>
+
+                <div class="acoes-lista">
+                    <button class="botao-secundario" (click)="adicionarItem()">
+                        <mat-icon>add</mat-icon> Adicionar Item
+                    </button>
+                </div>
+
+                <div class="acoes-registrar">
+                    <button class="botao-primario" (click)="registrarEntrada()"
+                        [disabled]="carregando || !itens.length">
+                        <mat-icon>save</mat-icon> Registrar Entrada
+                    </button>
+                </div>
+
+            </div>
+        </mat-tab>
+
+        <!-- Aba 2: Upload NF-e -->
+        <mat-tab label="Upload NF-e">
+            <div class="tab-content">
+
+                <div class="upload-area">
+                    <label class="upload-label">Arquivo XML da NF-e</label>
+                    <input type="file" accept=".xml" (change)="onArquivoSelecionado($event)" class="file-input" />
+                    <p class="upload-hint" *ngIf="arquivoNfe">Arquivo selecionado: <strong>{{ arquivoNfe.name
+                            }}</strong></p>
+                </div>
+
+                <div class="acoes-lista">
+                    <button class="botao-secundario" (click)="previewNfe()"
+                        [disabled]="!arquivoNfe || carregandoPreview">
+                        <mat-icon>preview</mat-icon>
+                        {{ carregandoPreview ? 'Processando...' : 'Pré-visualizar' }}
+                    </button>
+                </div>
+
+                <div *ngIf="previewItens.length > 0" class="preview-section">
+                    <h3 class="preview-title">Itens extraídos da NF-e ({{ previewItens.length }})</h3>
+
+                    <table class="mat-elevation-z2" mat-table [dataSource]="previewItens">
+
+                        <ng-container matColumnDef="idProduto">
+                            <th class="th-table" mat-header-cell *matHeaderCellDef>Produto</th>
+                            <td class="td-table" mat-cell *matCellDef="let item">{{ nomeProduto(item.idProduto) }}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="numeroLote">
+                            <th class="th-table" mat-header-cell *matHeaderCellDef>Lote</th>
+                            <td class="td-table" mat-cell *matCellDef="let item">{{ item.numeroLote }}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="quantidade">
+                            <th class="th-table" mat-header-cell *matHeaderCellDef>Quantidade</th>
+                            <td class="td-table" mat-cell *matCellDef="let item">{{ item.quantidade }}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="precoCusto">
+                            <th class="th-table" mat-header-cell *matHeaderCellDef>Preço Custo</th>
+                            <td class="td-table" mat-cell *matCellDef="let item">{{ item.precoCusto | currency:'BRL' }}
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="dataEntrada">
+                            <th class="th-table" mat-header-cell *matHeaderCellDef>Data Entrada</th>
+                            <td class="td-table" mat-cell *matCellDef="let item">{{ item.dataEntrada | date:'dd/MM/yyyy'
+                                }}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="dataValidade">
+                            <th class="th-table" mat-header-cell *matHeaderCellDef>Validade</th>
+                            <td class="td-table" mat-cell *matCellDef="let item">{{ item.dataValidade ?
+                                (item.dataValidade | date:'dd/MM/yyyy') : '—' }}</td>
+                        </ng-container>
+
+                        <tr mat-header-row *matHeaderRowDef="previewColumns"></tr>
+                        <tr mat-row *matRowDef="let row; columns: previewColumns;"></tr>
+                    </table>
+
+                    <div class="acoes-registrar">
+                        <button class="botao-primario" (click)="confirmarImportacaoNfe()" [disabled]="carregando">
+                            <mat-icon>cloud_upload</mat-icon> Confirmar Importação
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </mat-tab>
+
+        <!-- Aba 3: Saída de Estoque -->
+        <mat-tab label="Saída de Estoque">
+            <div class="tab-content">
+
+                <mat-form-field appearance="outline" class="field-produto">
+                    <mat-label>Produto</mat-label>
+                    <mat-select [(ngModel)]="saidaIdProduto" (ngModelChange)="onProdutoSaidaChange()">
+                        <mat-option [value]="0">Selecione...</mat-option>
+                        <mat-option *ngFor="let p of produtos" [value]="p.idProduto">{{ p.nome }}</mat-option>
+                    </mat-select>
+                </mat-form-field>
+
+                <div *ngIf="carregandoLotes" class="lotes-loading">
+                    <mat-spinner diameter="24"></mat-spinner>
+                    <span>Carregando lotes...</span>
+                </div>
+
+                <mat-form-field appearance="outline" class="field-produto" *ngIf="saidaLotes.length > 0">
+                    <mat-label>Lote</mat-label>
+                    <mat-select [(ngModel)]="saidaIdLote">
+                        <mat-option [value]="0">Selecione...</mat-option>
+                        <mat-option *ngFor="let l of saidaLotes" [value]="l.idLote">{{ loteLabel(l) }}</mat-option>
+                    </mat-select>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="field-num" *ngIf="saidaIdLote">
+                    <mat-label>Quantidade</mat-label>
+                    <input matInput type="number" min="0.01" step="0.01" [(ngModel)]="saidaQuantidade" />
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" style="width:100%" *ngIf="saidaIdLote">
+                    <mat-label>Motivo (opcional)</mat-label>
+                    <input matInput [(ngModel)]="saidaMotivo" placeholder="Ex: Consumo interno, venda, etc." />
+                </mat-form-field>
+
+                <div class="acoes-registrar" *ngIf="saidaIdLote">
+                    <button class="botao-primario" (click)="registrarSaida()"
+                        [disabled]="carregando || saidaQuantidade <= 0">
+                        <mat-icon>remove_circle</mat-icon> Registrar Saída
+                    </button>
+                </div>
+
+            </div>
+        </mat-tab>
+
+    </mat-tab-group>
+
+</div>

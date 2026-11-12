@@ -1,0 +1,143 @@
+<app-menu></app-menu>
+
+<div class="container-fluid pt-3">
+
+    <div class="page-header">
+        <div class="page-title">
+            <mat-icon class="icon">account_balance</mat-icon>
+            <h1>Fluxo de Caixa</h1>
+        </div>
+    </div>
+
+    <!-- FILTRO DE PERÍODO -->
+    <div class="filtro-card">
+        <mat-form-field appearance="outline">
+            <mat-label>Data início</mat-label>
+            <input matInput [matDatepicker]="pickerInicio" [(ngModel)]="inicioDate" placeholder="dd/mm/aaaa">
+            <mat-datepicker-toggle matIconSuffix [for]="pickerInicio"></mat-datepicker-toggle>
+            <mat-datepicker #pickerInicio></mat-datepicker>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+            <mat-label>Data fim</mat-label>
+            <input matInput [matDatepicker]="pickerFim" [(ngModel)]="fimDate" placeholder="dd/mm/aaaa">
+            <mat-datepicker-toggle matIconSuffix [for]="pickerFim"></mat-datepicker-toggle>
+            <mat-datepicker #pickerFim></mat-datepicker>
+        </mat-form-field>
+
+        <button class="btn-filtrar" (click)="carregar()">
+            <mat-icon>search</mat-icon> Filtrar
+        </button>
+    </div>
+
+    <!-- KPIs -->
+    <div class="row mb-4">
+        <div class="col-md-4 mb-3">
+            <div class="kpi-card entradas">
+                <div class="kpi-label">Total Entradas</div>
+                <div class="kpi-valor">{{ totalEntradas | currency:'BRL' }}</div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="kpi-card saidas">
+                <div class="kpi-label">Total Saídas</div>
+                <div class="kpi-valor">{{ totalSaidas | currency:'BRL' }}</div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="kpi-card" [class.saldo-positivo]="saldo >= 0" [class.saldo-negativo]="saldo < 0">
+                <div class="kpi-label">Saldo do Período</div>
+                <div class="kpi-valor">{{ saldo | currency:'BRL' }}</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOTAIS POR FORMA DE PAGAMENTO -->
+    <div class="row mb-4" *ngIf="entradasPorForma.length > 0 || saidasPorForma.length > 0">
+        <div class="col-md-6 mb-3" *ngIf="entradasPorForma.length > 0">
+            <div class="kpi-card" style="border-left-color: #22c55e;">
+                <div class="kpi-label" style="margin-bottom: 12px; font-weight: 600; color: #16a34a;">Entradas por Forma
+                    de Pagamento</div>
+                <div style="display: flex; flex-wrap: wrap; gap: 16px;">
+                    <div *ngFor="let item of entradasPorForma" style="min-width: 140px;">
+                        <span style="font-size: 12px; color: #888;">{{ item.forma }}</span><br>
+                        <strong style="font-size: 16px; color: #16a34a;">{{ item.total | currency:'BRL' }}</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-3" *ngIf="saidasPorForma.length > 0">
+            <div class="kpi-card" style="border-left-color: #ef4444;">
+                <div class="kpi-label" style="margin-bottom: 12px; font-weight: 600; color: #dc2626;">Saídas por Forma
+                    de Pagamento</div>
+                <div style="display: flex; flex-wrap: wrap; gap: 16px;">
+                    <div *ngFor="let item of saidasPorForma" style="min-width: 140px;">
+                        <span style="font-size: 12px; color: #888;">{{ item.forma }}</span><br>
+                        <strong style="font-size: 16px; color: #dc2626;">{{ item.total | currency:'BRL' }}</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TABELA -->
+    <div class="tabela-card">
+        <div class="tabela-header">
+            <span>Lançamentos do período</span>
+            <button class="btn-exportar" (click)="exportarPDF()" title="Exportar PDF" [disabled]="linhas.length === 0">
+                <mat-icon>download</mat-icon>
+            </button>
+        </div>
+        <div *ngIf="carregando" class="loading-center">
+            <mat-spinner diameter="40"></mat-spinner>
+        </div>
+
+        <table *ngIf="!carregando" class="tabela-fluxo">
+            <thead>
+                <tr>
+                    <th>Data</th>
+                    <th>Descrição</th>
+                    <th>Tipo</th>
+                    <th>Status</th>
+                    <th class="text-end">Valor</th>
+                    <th class="text-end">Saldo Acumulado</th>
+                    <th>Observação</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngIf="linhas.length === 0">
+                    <td colspan="6" class="sem-dados">Nenhum lançamento encontrado para o período.</td>
+                </tr>
+                <tr *ngFor="let l of linhas" [class.linha-entrada]="l.tipo === 'RECEBER'"
+                    [class.linha-saida]="l.tipo === 'PAGAR'">
+                    <td>{{ l.data | date:'dd/MM/yyyy' }}</td>
+                    <td>{{ l.descricao }}</td>
+                    <td>
+                        <span class="tipo-badge" [class.entrada]="l.tipo === 'RECEBER'"
+                            [class.saida]="l.tipo === 'PAGAR'">
+                            {{ l.tipo === 'RECEBER' ? '↑ Entrada' : '↓ Saída' }}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="status-badge" [class.badge-pago]="l.status === 'PAGO'"
+                            [class.badge-pendente]="l.status === 'PENDENTE'"
+                            [class.badge-vencido]="l.status === 'VENCIDO'"
+                            [class.badge-cancelado]="l.status === 'CANCELADO'">
+                            {{ l.status }}
+                        </span>
+                    </td>
+                    <td class="text-end valor-cell" [class.valor-entrada]="l.tipo === 'RECEBER'"
+                        [class.valor-saida]="l.tipo === 'PAGAR'">
+                        {{ l.tipo === 'RECEBER' ? '+' : '-' }} {{ l.valor | currency:'BRL' }}
+                    </td>
+                    <td class="text-end saldo-cell" [class.positivo]="l.saldoAcumulado >= 0"
+                        [class.negativo]="l.saldoAcumulado < 0">
+                        {{ l.saldoAcumulado | currency:'BRL' }}
+                    </td>
+                    <td style="font-size: 12px; color: #888;">{{ l.observacao || '—' }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>

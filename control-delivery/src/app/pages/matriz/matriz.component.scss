@@ -1,0 +1,63 @@
+.title {
+    font-size: 26px;
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+.subtitle {
+    font-size: 15px;
+    color: #6c757d;
+    margin-bottom: 20px;
+}
+
+/* Card visual */
+.card-dados {
+    background: #fff;
+    border-radius: 12px;
+    padding: 30px;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.05);
+}
+
+/* Labels */
+.form-group label {
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 6px;
+    color: #444;
+}
+
+/* Inputs */
+.form-control {
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid #dcdcdc;
+    transition: all 0.2s ease;
+    font-size: 14px;
+}
+
+.form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(0,123,255,0.15);
+}
+
+/* Inputs desabilitados */
+.form-control:disabled {
+    background-color: #f5f5f5;
+    color: #777;
+}
+
+/* Botão */
+app-button {
+    min-width: 200px;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+    .card-dados {
+        padding: 20px;
+    }
+
+    app-button {
+        width: 100%;
+    }
+}

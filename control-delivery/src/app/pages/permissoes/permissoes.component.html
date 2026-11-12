@@ -1,0 +1,92 @@
+<app-menu />
+<div class="container-fluid pt-3">
+
+    <div class="page-header">
+        <div class="page-title">
+            <div class="icon">🔐</div>
+            <div>
+                <h1>Gerenciar Permissões</h1>
+                <h2 class="subtitle">Selecione um usuário e configure suas permissões de acesso</h2>
+            </div>
+        </div>
+    </div>
+
+    <div *ngIf="carregando" class="loading-overlay">
+        <div class="spinner"></div>
+        <p>Carregando...</p>
+    </div>
+
+    <div class="split-layout" *ngIf="!carregando">
+
+        <!-- COLUNA ESQUERDA: lista de usuários -->
+        <div class="usuarios-panel">
+            <div class="panel-header">
+                <span>Usuários</span>
+                <span class="badge">{{ usuarios.length }}</span>
+            </div>
+
+            <div class="table-toolbar">
+                <mat-icon>search</mat-icon>
+                <input type="text" placeholder="Buscar usuário..." [(ngModel)]="filtro" />
+            </div>
+
+            <div class="usuario-list">
+                <div *ngFor="let u of usuariosFiltrados" class="usuario-item"
+                    [class.selected]="usuarioSelecionado?.id === u.id" (click)="selecionarUsuario(u)">
+                    <div class="usuario-avatar">{{ u.nome ? u.nome.charAt(0).toUpperCase() : '' }}</div>
+                    <div class="usuario-info">
+                        <span class="usuario-nome">{{ u.nome }}</span>
+                        <span class="usuario-username">{{ u.username }}</span>
+                    </div>
+                    <mat-icon class="c-primary" *ngIf="u.ativo" title="Ativo">check_circle</mat-icon>
+                    <mat-icon class="c-error" *ngIf="!u.ativo" title="Inativo">cancel</mat-icon>
+                </div>
+
+                <div *ngIf="usuariosFiltrados.length === 0" class="empty-state">
+                    Nenhum usuário encontrado
+                </div>
+            </div>
+        </div>
+
+        <!-- COLUNA DIREITA: permissões -->
+        <div class="permissoes-panel">
+            <ng-container *ngIf="!usuarioSelecionado">
+                <div class="empty-permissoes">
+                    <mat-icon>manage_accounts</mat-icon>
+                    <p>Selecione um usuário para gerenciar suas permissões</p>
+                </div>
+            </ng-container>
+
+            <ng-container *ngIf="usuarioSelecionado">
+                <div class="panel-header">
+                    <span>Permissões de <strong>{{ usuarioSelecionado.nome }}</strong></span>
+                </div>
+
+                <div *ngIf="carregandoPermissoes" class="loading-inline">
+                    <mat-progress-spinner mode="indeterminate" diameter="32"></mat-progress-spinner>
+                    <span>Carregando permissões...</span>
+                </div>
+
+                <div *ngIf="!carregandoPermissoes" class="permissoes-list">
+                    <div class="permissao-item" *ngFor="let p of todasPermissoes">
+                        <mat-checkbox [checked]="temPermissao(p.idPermissao)" (change)="togglePermissao(p.idPermissao)"
+                            color="primary">
+                            <div class="permissao-label">
+                                <span class="permissao-descricao">{{ p.descricao }}</span>
+                                <span class="permissao-chave">{{ p.chave }}</span>
+                            </div>
+                        </mat-checkbox>
+                    </div>
+                </div>
+
+                <div class="actions" *ngIf="!carregandoPermissoes">
+                    <button class="botao-primario" (click)="salvar()" [disabled]="salvando">
+                        <mat-icon>save</mat-icon>
+                        {{ salvando ? 'Salvando...' : 'Salvar permissões' }}
+                    </button>
+                </div>
+            </ng-container>
+        </div>
+
+    </div>
+</div>

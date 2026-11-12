@@ -1,0 +1,96 @@
+<app-menu />
+<div class="container-fluid pt-3">
+
+    <div class="page-header">
+        <div class="page-title">
+            <div class="icon">📋</div>
+            <div>
+                <h1>Movimentações de Estoque</h1>
+                <h2 class="subtitle">Histórico de entradas e saídas por período e produto</h2>
+            </div>
+        </div>
+    </div>
+
+    <div *ngIf="carregando" class="loading-overlay">
+        <div class="spinner"></div>
+        <p>Carregando...</p>
+    </div>
+
+    <div *ngIf="!carregando">
+        <div class="row mb-3 align-items-end g-2">
+            <div class="col-auto">
+                <label class="form-label">Data início</label>
+                <input type="datetime-local" class="form-control" [(ngModel)]="filtroInicio" />
+            </div>
+            <div class="col-auto">
+                <label class="form-label">Data fim</label>
+                <input type="datetime-local" class="form-control" [(ngModel)]="filtroFim" />
+            </div>
+            <div class="col-auto" style="min-width: 220px;">
+                <label class="form-label">Produto</label>
+                <select class="form-select" [(ngModel)]="filtroIdProduto">
+                    <option [ngValue]="undefined">Todos</option>
+                    <option *ngFor="let p of produtos" [ngValue]="p.idProduto">{{ p.nome }}</option>
+                </select>
+            </div>
+            <div class="col-auto">
+                <button class="botao-primario" (click)="buscar()">
+                    <mat-icon>search</mat-icon> Buscar
+                </button>
+            </div>
+            <div class="col-auto">
+                <button class="botao-secundario" (click)="exportarCsv()">
+                    <mat-icon>download</mat-icon> Exportar CSV
+                </button>
+            </div>
+        </div>
+
+        <table class="mat-elevation-z8" mat-table [dataSource]="dataSource" matSort>
+
+            <ng-container matColumnDef="dataHora">
+                <th class="th-table" mat-header-cell *matHeaderCellDef mat-sort-header>Data/Hora</th>
+                <td class="td-table" mat-cell *matCellDef="let m">{{ m.dataHora | date:'dd/MM/yyyy HH:mm' }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="tipo">
+                <th class="th-table" mat-header-cell *matHeaderCellDef mat-sort-header>Tipo</th>
+                <td class="td-table" mat-cell *matCellDef="let m">
+                    <span class="status-badge" [ngClass]="tipoClass(m.tipo)">{{ m.tipo }}</span>
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="nomeProduto">
+                <th class="th-table" mat-header-cell *matHeaderCellDef mat-sort-header>Produto</th>
+                <td class="td-table" mat-cell *matCellDef="let m">{{ m.nomeProduto }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="numeroLote">
+                <th class="th-table" mat-header-cell *matHeaderCellDef mat-sort-header>Lote</th>
+                <td class="td-table" mat-cell *matCellDef="let m">{{ m.numeroLote }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="quantidade">
+                <th class="th-table" mat-header-cell *matHeaderCellDef mat-sort-header>Quantidade</th>
+                <td class="td-table" mat-cell *matCellDef="let m">{{ m.quantidade }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="precoCusto">
+                <th class="th-table" mat-header-cell *matHeaderCellDef mat-sort-header>Preço Custo</th>
+                <td class="td-table" mat-cell *matCellDef="let m">{{ m.precoCusto | currency:'BRL' }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="idUsuarioResponsavel">
+                <th class="th-table" mat-header-cell *matHeaderCellDef mat-sort-header>Usuário</th>
+                <td class="td-table" mat-cell *matCellDef="let m">{{ m.idUsuarioResponsavel }}</td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+            <tr class="mat-row" *matNoDataRow>
+                <td class="mat-cell no-data" colspan="7">Nenhuma movimentação encontrada para o período selecionado</td>
+            </tr>
+        </table>
+
+        <mat-paginator [pageSizeOptions]="[10, 20, 50]" aria-label="Itens por página"></mat-paginator>
+    </div>
+</div>

@@ -1,0 +1,123 @@
+<div class="topbar">
+  <button class="hamburger" (click)="toggleMenu()" aria-label="Abrir menu">
+    <mat-icon>menu</mat-icon>
+  </button>
+  <span class="topbar-logo">EntregaJá</span>
+</div>
+
+<nav class="sidemenu">
+  <ul>
+
+    <!-- LOGO -->
+    <li routerLink="/home" class="logo-area">
+      <img title="Logo " src="../../../assets/logo.png" width="42px" />
+      <span class="logo">EntregaJá</span>
+    </li>
+
+    <!-- OPERAÇÃO -->
+    <li class="menu-title">📦 OPERAÇÃO</li>
+    <li routerLink="/home"><mat-icon>dashboard</mat-icon>Dashboard</li>
+    <li *ngIf="isSuperAdmin() || authService.temPermissao('INSERIR_ENTREGA')" routerLink="/inserir-entrega">
+      <mat-icon>add_shopping_cart</mat-icon>Inserir Entrega
+    </li>
+    <li *ngIf="isSuperAdmin() || authService.temPermissao('ACESSAR_ENTREGAS')" routerLink="/entregas">
+      <mat-icon>list_alt</mat-icon>Entregas
+    </li>
+    <li *ngIf="isSuperAdmin() || authService.temPermissao('ASSINAR_ENTREGA')" routerLink="/assinar-entregas">
+      <mat-icon>edit_square</mat-icon>Assinar Entregas
+    </li>
+
+    <!-- PESSOAS -->
+    <li class="menu-title"
+      *ngIf="isSuperAdmin() || authService.temPermissao('ACESSAR_VENDEDORES') || authService.temPermissao('ACESSAR_ENTREGADORES')">
+      👥 PESSOAS</li>
+    <li *ngIf="isSuperAdmin() || authService.temPermissao('ACESSAR_VENDEDORES')" routerLink="/usuario">
+      <mat-icon>person_add</mat-icon>Vendedores
+    </li>
+    <li *ngIf="isSuperAdmin() || authService.temPermissao('ACESSAR_ENTREGADORES')" routerLink="/entregador">
+      <mat-icon>motorcycle</mat-icon>Entregadores
+    </li>
+
+    <!-- ADMIN -->
+    <li class="menu-title"
+      *ngIf="isSuperAdmin() || authService.temPermissao('ACESSAR_MATRIZ') || authService.temPermissao('ACESSAR_SERVICOS') || authService.temPermissao('ACESSAR_FORMA_PAGAMENTO') || authService.temPermissao('ACESSAR_MAPA')">
+      ⚙️ ADMINISTRAÇÃO</li>
+    <li *ngIf="isSuperAdmin() || authService.temPermissao('ACESSAR_MATRIZ')" routerLink="/matriz">
+      <mat-icon>apartment</mat-icon>Matriz
+    </li>
+    <li *ngIf="isSuperAdmin() || authService.temPermissao('ACESSAR_MATRIZ')" routerLink="/filiais">
+      <mat-icon>store</mat-icon>Filiais
+    </li>
+    <li *ngIf="isSuperAdmin() || authService.temPermissao('ACESSAR_SERVICOS')" routerLink="/servicos">
+      <mat-icon>folder_open</mat-icon>Serviços
+    </li>
+    <li *ngIf="isSuperAdmin() || authService.temPermissao('ACESSAR_FORMA_PAGAMENTO')" routerLink="/forma-pagamento">
+      <mat-icon>payments</mat-icon>Formas de Pagamento
+    </li>
+    <li *ngIf="isSuperAdmin() || authService.temPermissao('ACESSAR_MAPA')" routerLink="/mapa-entrega">
+      <mat-icon>add_location</mat-icon>Mapa de Entregas
+    </li>
+    <li *ngIf="isSuperAdmin()" routerLink="/permissoes">
+      <mat-icon>manage_accounts</mat-icon>Permissões
+    </li>
+
+    <!-- GESTÃO -->
+    <li class="menu-title"
+      *ngIf="isSuperAdmin() || authService.temPermissao('ACESSAR_RELATORIOS') || authService.temPermissao('ACESSAR_CONTAS_PAGAR') || authService.temPermissao('ACESSAR_CONTAS_RECEBER')">
+      📊 GESTÃO</li>
+    <li *ngIf="isSuperAdmin() || authService.temPermissao('ACESSAR_RELATORIOS')" routerLink="/relatorios">
+      <mat-icon>bar_chart</mat-icon>Relatórios
+    </li>
+    <li *ngIf="isSuperAdmin() || authService.temPermissao('ACESSAR_CONTAS_PAGAR')" routerLink="/contas-pagar">
+      <mat-icon>money_off</mat-icon>Saídas
+    </li>
+    <li *ngIf="isSuperAdmin() || authService.temPermissao('ACESSAR_CONTAS_RECEBER')" routerLink="/contas-receber">
+      <mat-icon>attach_money</mat-icon>Entradas
+    </li>
+    <li *ngIf="isSuperAdmin() || authService.temPermissao('ACESSAR_RELATORIOS')" routerLink="/relatorio-contas">
+      <mat-icon>receipt_long</mat-icon>Relatório de Contas
+    </li>
+    <li
+      *ngIf="isSuperAdmin() || authService.temPermissao('ACESSAR_CONTAS_PAGAR') || authService.temPermissao('ACESSAR_CONTAS_RECEBER')"
+      routerLink="/fluxo-caixa">
+      <mat-icon>waterfall_chart</mat-icon>Fluxo de Caixa
+    </li>
+    <li
+      *ngIf="isSuperAdmin() || authService.temPermissao('ACESSAR_CONTAS_PAGAR') || authService.temPermissao('ACESSAR_CONTAS_RECEBER')"
+      routerLink="/categorias">
+      <mat-icon>label</mat-icon>Categorias
+    </li>
+
+    <!-- ESTOQUE -->
+    <li class="menu-title"
+      *ngIf="isSuperAdmin() || authService.temPermissao('ACESSAR_ESTOQUE') || authService.temPermissao('GERENCIAR_ESTOQUE')">
+      📦 ESTOQUE
+    </li>
+    <li
+      *ngIf="isSuperAdmin() || authService.temPermissao('ACESSAR_ESTOQUE') || authService.temPermissao('GERENCIAR_ESTOQUE')"
+      routerLink="/estoque/produtos">
+      <mat-icon>inventory_2</mat-icon>Produtos
+    </li>
+    <li
+      *ngIf="isSuperAdmin() || authService.temPermissao('ACESSAR_ESTOQUE') || authService.temPermissao('GERENCIAR_ESTOQUE')"
+      routerLink="/estoque/movimentacoes">
+      <mat-icon>swap_horiz</mat-icon>Movimentações
+    </li>
+    <li *ngIf="isSuperAdmin() || authService.temPermissao('GERENCIAR_ESTOQUE')" routerLink="/estoque/entrada">
+      <mat-icon>add_box</mat-icon>Entrada de Estoque
+    </li>
+    <li
+      *ngIf="isSuperAdmin() || authService.temPermissao('ACESSAR_ESTOQUE') || authService.temPermissao('GERENCIAR_ESTOQUE')"
+      routerLink="/estoque/relatorio">
+      <mat-icon>assessment</mat-icon>Relatório de Estoque
+    </li>
+
+    <!-- LOGOUT -->
+    <li class="logout" (click)="logout()">
+      <mat-icon>logout</mat-icon>Sair
+    </li>
+
+  </ul>
+</nav>
+
+<div class="overlay" (click)="closeMenu()"></div>

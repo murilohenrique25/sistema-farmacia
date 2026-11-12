@@ -1,0 +1,79 @@
+<div class="container-fluid p-3">
+    <mat-icon (click)="closeModal()" class="float-end hover">close</mat-icon>
+
+    <h1 class="title">{{ editarFilial ? 'Editar filial' : 'Cadastrar filial' }}</h1>
+    <h2 class="subtitle">Preencha o formulário com os dados da filial</h2>
+
+    <form class="row" [formGroup]="formFilial">
+
+        <div class="col-12 col-md-6 mb-2">
+            <mat-form-field class="w-100">
+                <mat-label>Nome</mat-label>
+                <input type="text" matInput formControlName="nome" placeholder="Nome da filial">
+                <mat-error *ngIf="formFilial.controls['nome'].invalid">Informe o nome da filial</mat-error>
+            </mat-form-field>
+        </div>
+
+        <div class="col-12 col-md-6 mb-2">
+            <mat-form-field class="w-100">
+                <mat-label>CNPJ</mat-label>
+                <input type="text" matInput formControlName="cnpj" placeholder="CNPJ">
+            </mat-form-field>
+        </div>
+
+        <div class="col-12 col-md-6 mb-2">
+            <mat-form-field class="w-100">
+                <mat-label>Logradouro</mat-label>
+                <input type="text" matInput formControlName="logradouro" placeholder="Endereço">
+            </mat-form-field>
+        </div>
+
+        <div class="col-12 col-md-6 mb-2">
+            <mat-form-field class="w-100">
+                <mat-label>Telefone</mat-label>
+                <input type="tel" matInput formControlName="telefone" placeholder="Telefone">
+            </mat-form-field>
+        </div>
+
+        <div class="col-12 col-md-6 mb-2">
+            <mat-form-field class="w-100">
+                <mat-label>Email</mat-label>
+                <input type="email" matInput formControlName="email" placeholder="Email">
+            </mat-form-field>
+        </div>
+
+        <div class="col-12 col-md-6 mb-2">
+            <mat-form-field class="w-100">
+                <mat-label>Latitude</mat-label>
+                <input type="text" matInput formControlName="latitude" placeholder="Latitude">
+            </mat-form-field>
+        </div>
+
+        <div class="col-12 col-md-6 mb-2">
+            <mat-form-field class="w-100">
+                <mat-label>Longitude</mat-label>
+                <input type="text" matInput formControlName="longitude" placeholder="Longitude">
+            </mat-form-field>
+        </div>
+
+        <div class="col-12 col-md-6 mb-2 d-flex align-items-center">
+            <mat-checkbox formControlName="freteFixo">Taxa de frete fixa</mat-checkbox>
+        </div>
+
+        <div class="col-12 col-md-6 mb-2" *ngIf="formFilial.controls['freteFixo'].value">
+            <mat-form-field class="w-100">
+                <mat-label>Valor do Frete (R$)</mat-label>
+                <input type="number" min="0" step="0.01" matInput formControlName="valorFrete"
+                    placeholder="Valor do frete fixo">
+                <mat-error *ngIf="formFilial.controls['valorFrete'].invalid">Informe o valor do frete</mat-error>
+            </mat-form-field>
+        </div>
+
+        <div class="col-12 mb-2">
+            <button type="button" class="botao-primario float-end" [disabled]="!formFilial.valid || isSaving"
+                (click)="salvarFilial()">
+                {{ isSaving ? 'Salvando...' : (editarFilial ? 'Editar filial' : 'Salvar filial') }}
+            </button>
+        </div>
+    </form>
+</div>

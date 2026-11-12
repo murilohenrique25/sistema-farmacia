@@ -1,0 +1,39 @@
+<div class="container-fluid p-3">
+    <mat-icon (click)="closeModal()" class="float-end hover">close</mat-icon>
+
+    <h1 class="title">Detalhes do usuário</h1>
+    <h2 class="subtitle">Tenha uma visão mais detalhada do vendedor</h2>
+
+    <div class="row mt-3">
+        <div class="col-6">
+            <h4 class="title-information">Id</h4>
+            <p class="information">{{userData.id}}</p>
+        </div>
+        <div class="col-6">
+            <h4 class="title-information">Nome</h4>
+            <p class="information">{{userData.nome}}</p>
+        </div>
+        <div class="col-6">
+            <h4 class="title-information">Usuário</h4>
+            <p class="information">{{userData.username}}</p>
+        </div>
+        <div class="col-6">
+            <h4 class="title-information">CPF</h4>
+            <p class="information" *ngIf="userData.cpf">{{userData.cpf}}</p>
+            <p class="information" *ngIf="!userData.cpf"> - </p>
+        </div>
+        <div class="col-6">
+            <h4 class="title-information">Turno</h4>
+            <p class="information">{{userData.turno}}</p>
+        </div>
+        <div class="col-6">
+            <h4 class="title-information">Ativo</h4>
+            <p class="information">{{userData.ativo ? 'Ativo' : 'Desativado'}}</p>
+        </div>
+        <div class="col-6">
+            <h4 class="title-information">Telefone</h4>
+            <p class="information" *ngIf="userData.telefone">{{userData.telefone}}</p>
+            <p class="information" *ngIf="!userData.telefone">-</p>
+        </div>
+    </div>
+</div>

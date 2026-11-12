@@ -1,0 +1,78 @@
+<div class="container-fluid p-3">
+    <mat-icon (click)="fechar()" class="float-end hover">close</mat-icon>
+    <h1 class="title">{{ editando ? 'Editar' : 'Nova' }} {{ data.tipo === 'PAGAR' ? 'Saída' : 'Entrada' }}</h1>
+    <h2 class="subtitle">Preencha os dados da conta</h2>
+
+    <form [formGroup]="form" class="row mt-2">
+        <div class="col-12 mb-2">
+            <mat-form-field class="w-100">
+                <mat-label>Descrição</mat-label>
+                <input matInput formControlName="descricao" placeholder="Ex: Aluguel de outubro">
+                <mat-error *ngIf="form.controls['descricao'].invalid">Campo obrigatório</mat-error>
+            </mat-form-field>
+        </div>
+
+        <div class="col-6 mb-2">
+            <mat-form-field class="w-100">
+                <mat-label>Valor (R$)</mat-label>
+                <input matInput type="number" formControlName="valor" placeholder="0,00">
+                <mat-error *ngIf="form.controls['valor'].invalid">Valor inválido</mat-error>
+            </mat-form-field>
+        </div>
+
+        <div class="col-6 mb-2">
+            <mat-form-field class="w-100">
+                <mat-label>Data Cadastro</mat-label>
+                <input matInput [matDatepicker]="picker" formControlName="dataVencimento">
+                <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                <mat-datepicker #picker></mat-datepicker>
+                <mat-error *ngIf="form.controls['dataVencimento'].invalid">Data obrigatória</mat-error>
+            </mat-form-field>
+        </div>
+
+        <div class="col-6 mb-2">
+            <mat-form-field class="w-100">
+                <mat-label>Categoria</mat-label>
+                <mat-select formControlName="categoria">
+                    <mat-option value="">— Nenhuma —</mat-option>
+                    <mat-option *ngFor="let c of categorias" [value]="c">{{ c }}</mat-option>
+                </mat-select>
+            </mat-form-field>
+        </div>
+
+        <div class="col-6 mb-2">
+            <mat-form-field class="w-100">
+                <mat-label>Forma de Pagamento</mat-label>
+                <mat-select formControlName="formaPagamento">
+                    <mat-option value="">— Nenhuma —</mat-option>
+                    <mat-option *ngFor="let f of formasPagamento" [value]="f">{{ f }}</mat-option>
+                </mat-select>
+            </mat-form-field>
+        </div>
+
+        <div class="col-6 mb-2" *ngIf="editando">
+            <mat-form-field class="w-100">
+                <mat-label>Status</mat-label>
+                <mat-select formControlName="status">
+                    <mat-option value="PENDENTE">Pendente</mat-option>
+                    <mat-option value="PAGO">Pago</mat-option>
+                    <mat-option value="VENCIDO">Vencido</mat-option>
+                    <mat-option value="CANCELADO">Cancelado</mat-option>
+                </mat-select>
+            </mat-form-field>
+        </div>
+
+        <div class="col-12 mb-2">
+            <mat-form-field class="w-100">
+                <mat-label>Observação</mat-label>
+                <textarea matInput formControlName="observacao" rows="2"></textarea>
+            </mat-form-field>
+        </div>
+
+        <div class="col-12 text-end">
+            <button type="button" class="botao-primario" [disabled]="form.invalid" (click)="salvar()">
+                {{ editando ? 'Salvar alterações' : 'Cadastrar conta' }}
+            </button>
+        </div>
+    </form>
+</div>

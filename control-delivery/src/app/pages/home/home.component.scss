@@ -1,0 +1,310 @@
+.card-info {
+    background: white;
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 10px 20px 0px rgb(113 48 223 / 39%);
+}
+
+.hero {
+    background: linear-gradient(291deg, #6c2bd96e, #7c3aedd6);
+    color: white;
+}
+
+.hero .subtitle {
+    font-size: 18px;
+    opacity: 0.95;
+}
+
+.kpi {
+    text-align: center;
+}
+
+.kpi h2 {
+    font-size: 32px;
+    margin-top: 10px;
+}
+
+.kpi.success h2 {
+    color: #22c55e;
+}
+
+.kpi.danger h2 {
+    color: #ef4444;
+}
+
+.destaque {
+    border-left: 6px solid #7c3aed;
+}
+
+.perfil .img-perfil {
+    width: 90px;
+    border-radius: 50%;
+    margin-bottom: 10px;
+}
+
+.loading-overlay {
+    text-align: center;
+    padding: 50px;
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 5px solid #ddd;
+    border-top: 5px solid #7c3aed;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: auto;
+}
+
+@keyframes spin {
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+span.badge.bg-success {
+    font-weight: 500;
+}
+
+span.dadoHOme {
+    font-weight: 500;
+}
+
+.alertas-card {
+    border-left: 6px solid #f59e0b;
+}
+
+.alertas-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.alerta-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    border-radius: 8px;
+}
+
+.alerta-vencido {
+    background: #fff1f2;
+}
+
+.alerta-proximo {
+    background: #fffbeb;
+}
+
+.alerta-icone mat-icon {
+    font-size: 22px;
+    width: 22px;
+    height: 22px;
+}
+
+.alerta-vencido .alerta-icone mat-icon {
+    color: #ef4444;
+}
+
+.alerta-proximo .alerta-icone mat-icon {
+    color: #f59e0b;
+}
+
+.alerta-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.alerta-descricao {
+    font-size: 14px;
+    font-weight: 500;
+    color: #333;
+}
+
+.alerta-detalhe {
+    font-size: 12px;
+    color: #777;
+}
+
+.alerta-badge span {
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.badge-vencido {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.badge-hoje {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.badge-proximo {
+    background: #fef9c3;
+    color: #713f12;
+}
+
+.hero-generico {
+    background: linear-gradient(291deg, #6c2bd96e, #7c3aedd6);
+    color: white;
+
+    .subtitle {
+        font-size: 18px;
+        opacity: 0.95;
+    }
+
+    .hero-icon {
+        font-size: 100px;
+        width: 100px;
+        height: 100px;
+        opacity: 0.6;
+        color: white;
+    }
+}
+
+.card-atalho {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+
+    &:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 14px 28px rgba(113, 48, 223, 0.3);
+    }
+
+    .atalho-icone {
+        width: 56px;
+        height: 56px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+
+        mat-icon {
+            font-size: 28px;
+            width: 28px;
+            height: 28px;
+            color: white;
+        }
+
+        &.pagar {
+            background: #ef4444;
+        }
+
+        &.receber {
+            background: #22c55e;
+        }
+    }
+
+    .atalho-info {
+        flex: 1;
+
+        h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin: 0 0 4px;
+        }
+
+        p {
+            font-size: 13px;
+            color: var(--gray-color);
+            margin: 0;
+        }
+    }
+
+    .atalho-seta {
+        color: #ccc;
+    }
+}
+
+// Responsive dashboard — mobile (< 768px)
+@media (max-width: 767px) {
+    .container-fluid {
+        padding-top: 70px !important;
+    }
+
+    .card-info.hero,
+    .card-info.hero-generico {
+        .row {
+            flex-direction: column;
+        }
+
+        img,
+        .hero-icon {
+            display: none;
+        }
+    }
+
+    .hero .subtitle,
+    .hero-generico .subtitle {
+        font-size: 14px;
+    }
+
+    .title {
+        font-size: 20px;
+    }
+
+    .card-info.kpi {
+        width: 100%;
+
+        h2 {
+            font-size: 24px;
+        }
+    }
+
+    .alerta-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+    }
+
+    .alerta-badge {
+        align-self: flex-start;
+    }
+
+    .card-atalho {
+        padding: 14px;
+
+        .atalho-icone {
+            width: 44px;
+            height: 44px;
+        }
+
+        .atalho-info h3 {
+            font-size: 14px;
+        }
+
+        .atalho-info p {
+            font-size: 12px;
+        }
+    }
+
+    .destaque .row {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .perfil {
+        margin-top: 16px;
+    }
+}
+
+// Responsive dashboard — tablet (768px – 1024px)
+@media (min-width: 768px) and (max-width: 1024px) {
+    .card-info.kpi {
+        width: calc(50% - 8px);
+    }
+
+    .card-info.hero img {
+        width: 100%;
+    }
+}

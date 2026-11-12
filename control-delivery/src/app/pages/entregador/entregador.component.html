@@ -1,0 +1,82 @@
+<app-menu />
+<div class="container-fluid pt-3">
+    <div class="page-header">
+        <div class="page-title">
+            <div class="icon">🏍️</div>
+            <div>
+                <h1>Cadastro de Entregadores</h1>
+                <h2 class="subtitle">Gerencie os entregadores, adicionando ou editando</h2>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div *ngIf="!existeDado" class="loading-overlay">
+            <div class="spinner"></div>
+            <p>Carregando...</p>
+        </div>
+
+        <div class="col-12">
+            <app-button class="float-end" (click)="addModalEntregador()" textButton="+ cadastrar"></app-button>
+            <div class="table-toolbar">
+                <mat-icon>search</mat-icon>
+                <input type="text" placeholder="Buscar por código, nome..."
+                    (keyup)="aplicarFilto($event)" #input />
+            </div>
+
+            <table class="mat-elevation-z8" mat-table [dataSource]="dataSource" matSort>
+
+                <ng-container matColumnDef="idEntregador">
+                    <th class="th-table" mat-header-cell *matHeaderCellDef mat-sort-header> ID </th>
+                    <td class="td-table" mat-cell *matCellDef="let entregador"> {{entregador.idEntregador}} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="nome">
+                    <th class="th-table" mat-header-cell *matHeaderCellDef mat-sort-header> Nome </th>
+                    <td class="td-table" mat-cell *matCellDef="let entregador"> {{entregador.nome}} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="usuario">
+                    <th class="th-table" mat-header-cell *matHeaderCellDef mat-sort-header> Usuário </th>
+                    <td class="td-table" mat-cell *matCellDef="let entregador"> {{entregador.usuario}} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="ativo">
+                    <th class="th-table" mat-header-cell *matHeaderCellDef mat-sort-header> Status </th>
+                    <td class="td-table" mat-cell *matCellDef="let entregador">
+                        <mat-icon class="c-primary" *ngIf="entregador.ativo">check</mat-icon>
+                        <mat-icon class="c-error" *ngIf="!entregador.ativo">remove</mat-icon>
+
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="turno">
+                    <th class="th-table" mat-header-cell *matHeaderCellDef mat-sort-header> Turno </th>
+                    <td class="td-table" mat-cell *matCellDef="let entregador"> {{entregador.turno}} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="action">
+                    <th class="th-table" style="width: 12%;" mat-header-cell *matHeaderCellDef mat-sort-header> </th>
+                    <td class="td-table" mat-cell *matCellDef="let entregador">
+                        <mat-icon class="icone-tabela"
+                            (click)="openModalViewEntregador(entregador)">visibility</mat-icon>
+                        <mat-icon class="icone-tabela" (click)="openModalEditEntregador(entregador)">edit</mat-icon>
+                        <!-- <mat-icon class="icone-tabela">delete</mat-icon>-->
+                    </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+                <!-- Row shown when there is no matching data. -->
+                <tr class="mat-row" *matNoDataRow>
+                    <td class="mat-cell no-data" colspan="4">Nenhum entregador encontrado para a pesquisa
+                        "{{input.value}}"
+                    </td>
+                </tr>
+            </table>
+
+            <mat-paginator class="shadow-sm" [pageSizeOptions]="[10, 15, 25]"
+                aria-label="Selecione quantidade de entregadores por página"></mat-paginator>
+        </div>
+    </div>
+</div>

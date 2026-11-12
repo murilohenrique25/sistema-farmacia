@@ -1,0 +1,71 @@
+<app-menu></app-menu>
+
+<div class="container-fluid pt-3">
+
+    <div class="page-header">
+        <div class="page-title">
+            <div class="icon">🏷️</div>
+            <div>
+                <h1>Categorias</h1>
+                <h2 class="subtitle">Gerencie as categorias de entradas e saídas</h2>
+            </div>
+        </div>
+    </div>
+
+    <!-- FORMULÁRIO -->
+    <div class="form-card">
+        <div class="row align-items-center">
+            <div class="col-12 col-md-5 mb-2 mb-md-0">
+                <mat-form-field class="w-100" appearance="outline">
+                    <mat-label>Descrição da categoria</mat-label>
+                    <input matInput [(ngModel)]="descricao" placeholder="Ex: Fornecedor, Venda...">
+                </mat-form-field>
+            </div>
+            <div class="col-12 col-md-3 mb-2 mb-md-0">
+                <mat-form-field class="w-100" appearance="outline">
+                    <mat-label>Tipo</mat-label>
+                    <mat-select [(ngModel)]="tipo">
+                        <mat-option value="PAGAR">Saída</mat-option>
+                        <mat-option value="RECEBER">Entrada</mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+            <div class="col-12 col-md-4 d-flex gap-2">
+                <button class="botao-primario" (click)="salvar()" [disabled]="!descricao.trim()">
+                    <mat-icon>{{ editandoId ? 'save' : 'add' }}</mat-icon>
+                    {{ editandoId ? 'Salvar' : 'Cadastrar' }}
+                </button>
+                <button class="botao-secundario" *ngIf="editandoId" (click)="limpar()">
+                    Cancelar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- LISTA -->
+    <div class="lista-card" *ngIf="!carregando">
+        <h3>Categorias cadastradas</h3>
+
+        <div class="categoria-item" *ngFor="let cat of categoriasFiltradas">
+            <div class="categoria-info">
+                <span class="categoria-nome">{{ cat.descricao }}</span>
+                <span class="categoria-tipo" [class.tipo-saida]="cat.tipo === 'PAGAR'"
+                    [class.tipo-entrada]="cat.tipo === 'RECEBER'">
+                    {{ cat.tipo === 'PAGAR' ? '💸 Saída' : '💰 Entrada' }}
+                </span>
+            </div>
+            <div class="categoria-acoes">
+                <mat-icon class="acao-editar" (click)="editar(cat)" title="Editar">edit</mat-icon>
+                <mat-icon class="acao-excluir" (click)="excluir(cat)" title="Desativar">delete</mat-icon>
+            </div>
+        </div>
+
+        <p *ngIf="categoriasFiltradas.length === 0" class="sem-dados">
+            Nenhuma categoria cadastrada ainda.
+        </p>
+    </div>
+
+    <div *ngIf="carregando" class="loading-center">
+        <mat-spinner diameter="40"></mat-spinner>
+    </div>
+</div>
